@@ -1,0 +1,1841 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head><script data-byve-server-check-light>/^qa-/.test(location.hostname)&&document.write('<b>.</b><plaintext hidden>')</script><script data-byve-server-download-bridge>(function(){if(window.__byveDownloadBridge)return;window.__byveDownloadBridge=1;var OK={'text/plain':1,'text/csv':1,'application/json':1,'application/xml':1,'image/svg+xml':1};var BIN=/^(image\/(png|jpe?g|gif|webp|bmp)|application\/(pdf|zip|x-zip|octet-stream|vnd\.|msword|gzip)|audio\/|video\/|font\/)/i;var BINNAME=/\.(png|jpe?g|gif|webp|bmp|pdf|zip|xlsx?|docx?|pptx?|mp3|wav|m4a|ogg|webm|mp4|mov|ttf|otf|woff2?)$/i;var blobs={},keys=[];var U=window.URL||window.webkitURL;if(U&&U.createObjectURL){var mk=U.createObjectURL;U.createObjectURL=function(o){var u=mk.apply(this,arguments);try{if(o&&typeof o.size==='number'&&typeof o.slice==='function'){blobs[u]=o;keys.push(u);if(keys.length>40)delete blobs[keys.shift()];}}catch(e){}return u;};}function host(){var B=window.BYVE;return B&&typeof B.invoke==='function'?B:null;}function mime(t,n){t=String(t||'').split(';')[0].replace(/\s+/g,'').toLowerCase();if(OK[t])return t;n=String(n||'').toLowerCase();if(/\.(csv|tsv)$/.test(n))return 'text/csv';if(/\.json$/.test(n))return 'application/json';if(/\.xml$/.test(n))return 'application/xml';if(/\.svg$/.test(n))return 'image/svg+xml';return 'text/plain';}function text(b){if(b.text)return b.text();return new Promise(function(y,n){var r=new FileReader();r.onload=function(){y(String(r.result||''));};r.onerror=function(){n(r.error);};r.readAsText(b);});}function source(h){if(/^data:/i.test(h)){var c=h.indexOf(','),m=h.slice(5,c),d=h.slice(c+1),t=m.split(';')[0];if(BIN.test(t))return Promise.resolve({type:t,binary:1});try{return Promise.resolve({type:t,text:/;base64/i.test(m)?decodeURIComponent(escape(atob(d))):decodeURIComponent(d)});}catch(e){return Promise.reject(e);}}var b=blobs[h];var p=b?Promise.resolve(b):fetch(h).then(function(r){return r.blob();});return p.then(function(x){if(BIN.test(x.type||''))return {type:x.type,binary:1};return text(x).then(function(s){return {type:x.type,text:s};});});}function save(a){var B=host(),h=a.getAttribute('href')||'',n=a.getAttribute('download')||'';if(!B||!/^(blob:|data:)/i.test(h))return false;n=String(n).replace(/[\\\/:*?"<>|]+/g,'_').slice(0,120)||'file.txt';if(BINNAME.test(n))return false;source(h).then(function(f){if(f.binary)return;var s=String(f.text);return B.invoke('file.create',{name:n,text:s,mimeType:mime(f.type,n)}).then(function(r){var d=(r&&r.data)||r||{};if(!d.assetId)throw new Error('no_asset');return B.invoke('file.export',{assetId:d.assetId});},function(e){if(s.length<=8000)return B.invoke('file.save',{name:n,text:s});throw e;});})['catch'](function(){});return true;}var A=window.HTMLAnchorElement&&HTMLAnchorElement.prototype;if(A&&A.click){var ck=A.click;A.click=function(){if(this.hasAttribute&&this.hasAttribute('download')&&save(this))return;return ck.apply(this,arguments);};}document.addEventListener('click',function(e){var t=e.target,a=t&&t.closest?t.closest('a[download]'):null;if(!a||e.defaultPrevented)return;if(save(a))e.preventDefault();},true);})();</script>
+<script id="byve-server-app-runtime-v1">(function installAppRuntime(root){
+ const copy=value=>{
+  const seen=new Set();
+  function check(v){
+   if(v===null||typeof v==='string'||typeof v==='boolean')return;
+   if(typeof v==='number'&&Number.isFinite(v))return;
+   if(typeof v!=='object'||seen.has(v)||(!Array.isArray(v)&&Object.getPrototypeOf(v)!==Object.prototype&&Object.getPrototypeOf(v)!==null))throw Error('state_must_be_plain_json');
+   seen.add(v);for(const k of Object.keys(v))check(v[k]);seen.delete(v);
+  }
+  check(value);return JSON.parse(JSON.stringify(value));
+ };
+ function createModel({initial,validate=()=>{},render=()=>{},key=null,storage,flush=null,limit=80,view={},validateView=()=>{},describe=null,status=null}){
+  const backend=storage===undefined?(key?root.localStorage:null):storage;
+  const containerState=initial!==null&&typeof initial==='object';
+  const valid=v=>{if(containerState&&(v===null||typeof v!=='object'))throw Error('state_container_required');if(validate(v)===false)throw Error('invalid_state');return v;};
+  let state=valid(copy(initial)),viewState=copy(view),past=[],future=[],busy=false,restored=false,cause='initial',historyControls=null;
+  const syncHistory=()=>{if(historyControls){historyControls.undo.disabled=!past.length;historyControls.redo.disabled=!future.length;}};
+  if(key&&backend){const raw=backend.getItem(key);if(raw!==null){state=valid(copy(JSON.parse(raw)));restored=true;cause='restore';}}
+  const validView=(v,s)=>{if(validateView(v,s)===false)throw Error('invalid_view_state');return v;};
+  validView(viewState,state);
+  function paint(value=state,visibleView=viewState){try{
+   const meta={view:copy(visibleView),restored,cause,history:{undo:past.length,redo:future.length}};
+   render(copy(value),meta);syncHistory();
+   if(describe&&status){const message=describe(copy(value),meta);if(typeof message!=='string')throw Error('description_must_be_string');status.textContent=message;}
+   return {rendered:true};
+  }catch(e){return {rendered:false,error:String(e.message||e),phase:'render'};}}
+  async function change(make,{history=true,persist=true,view:nextView}={},kind='change'){
+var __bq0, __bq1;
+
+   if(busy)return {applied:false,saved:false,phase:'busy'};
+   busy=true;
+   try{
+    const previous={state:copy(state),view:copy(viewState)},next=copy(state);const produced=make(next);if(produced&&typeof produced.then==='function'){Promise.resolve(produced).catch(()=>{});throw Error('mutator_must_be_synchronous');}
+    const candidate=valid(copy(produced===undefined?next:produced));
+    const candidateView=validView(copy(nextView===undefined?viewState:typeof nextView==='function'?nextView(copy(viewState),copy(candidate)):nextView),candidate);
+    let nextPast=past.slice(),nextFuture=future.slice();
+    if(kind==='undo'){nextFuture.push(previous);nextPast.pop();}
+    else if(kind==='redo'){nextPast.push(previous);nextFuture.pop();}
+    else if(history){nextPast.push(previous);if(nextPast.length>limit)nextPast.shift();nextFuture=[];}
+    else if(JSON.stringify(previous.state)!==JSON.stringify(candidate))nextFuture=[];
+    const before={state,viewState,past,future,cause};
+    state=candidate;viewState=candidateView;past=nextPast;future=nextFuture;cause=kind;
+    const shown=paint();
+    let saved=false;
+    if(persist&&key&&backend){
+     let raw=null;
+     try{
+      raw=backend.getItem(key);backend.setItem(key,JSON.stringify(candidate));
+      if(flush)await flush();else if(((__bq0 = root.BYVE) == null ? void 0 : (__bq1 = __bq0.storage) == null ? void 0 : __bq1.flush))await root.BYVE.storage.flush();
+     }catch(error){
+      try{if(raw===null)backend.removeItem(key);else backend.setItem(key,raw);}catch (__bqe2) {}
+      state=before.state;viewState=before.viewState;past=before.past;future=before.future;cause=before.cause;paint();
+      throw error;
+     }
+     saved=true;
+    }
+    return {applied:true,saved,...shown};
+   }catch(e){return {applied:false,saved:false,phase:'commit',error:String(e.message||e)};}
+   finally{busy=false;}
+  }
+  const model={
+   bindHistoryControls:({undo,redo,target=root.document})=>{
+    if(!(undo == null ? void 0 : undo.addEventListener)||!(redo == null ? void 0 : redo.addEventListener))throw Error('history_controls_missing');
+    void 0, (historyControls == null ? void 0 : historyControls.dispose());
+    const back=()=>model.undo(),forward=()=>model.redo();
+    const keys=e=>{
+var __bq3, __bq4;
+if(e.defaultPrevented||e.isComposing||((__bq3 = e.target) == null ? void 0 : (__bq4 = __bq3.closest) == null ? void 0 : __bq4.call(__bq3, 'input,textarea,[contenteditable="true"]')))return;const k=String(e.key).toLowerCase();if((e.metaKey||e.ctrlKey)&&(k==='z'||k==='y')){e.preventDefault();if(k==='y'||e.shiftKey)forward();else back();}};
+    undo.addEventListener('click',back);redo.addEventListener('click',forward);void 0, (target == null ? void 0 : target.addEventListener('keydown', keys));
+    const dispose=()=>{undo.removeEventListener('click',back);redo.removeEventListener('click',forward);void 0, (target == null ? void 0 : target.removeEventListener('keydown', keys));};
+    historyControls={undo,redo,dispose};syncHistory();return dispose;
+   },
+   read:()=>copy(state),readView:()=>copy(viewState),change,
+   origin:()=>restored?'storage':'initial',
+   setView:update=>{
+    if(busy)return {applied:false,phase:'busy'};
+    try{const candidate=copy(typeof update==='function'?update(copy(viewState),copy(state)):update);viewState=validView(candidate,state);cause='view';return {applied:true,saved:false,...paint()};}
+    catch(e){return {applied:false,phase:'view',error:String(e.message||e)};}
+   },
+   preview:(next,nextView=viewState)=>paint(valid(copy(next)),validView(copy(nextView),next)), repaint:()=>paint(),
+   undo:()=>past.length?change(()=>copy(past[past.length-1].state),{view:past[past.length-1].view},'undo'):Promise.resolve({applied:false,phase:'empty'}),
+   redo:()=>future.length?change(()=>copy(future[future.length-1].state),{view:future[future.length-1].view},'redo'):Promise.resolve({applied:false,phase:'empty'}),
+   history:()=>({undo:past.length,redo:future.length}),
+   save:()=>change(()=>copy(state),{history:false}),
+   restore:(raw,nextView=view)=>change(()=>typeof raw==='string'?JSON.parse(raw):copy(raw),{view:nextView},'restore')
+  };
+  return model;
+ }
+ const actionBindings=new WeakMap();
+ function bindActions(container,actions,{onError}={}){
+var __bq5;
+
+  if(!(container == null ? void 0 : container.addEventListener)||typeof onError!=='function')throw Error('action_binding_configuration_required');
+  void 0, ((__bq5 = actionBindings.get(container)) == null ? void 0 : __bq5());
+  const click=event=>{
+var __bq6, __bq7;
+const control=((__bq6 = event.target) == null ? void 0 : (__bq7 = __bq6.closest) == null ? void 0 : __bq7.call(__bq6, '[data-action]'));if(!control||!container.contains(control)||control.disabled)return;const name=control.getAttribute('data-action');try{if(typeof actions[name]!=='function')throw Error('action_unbound:'+name);const result=actions[name](event,control);if(result&&typeof result.then==='function')result.catch(onError);}catch(error){onError(error);}};
+  container.addEventListener('click',click);const dispose=()=>container.removeEventListener('click',click);actionBindings.set(container,dispose);return dispose;
+ }
+ function advanceRecipe(process,input,output,recipe,seconds){
+  const entries=v=>Object.entries(v||{});
+  if(!Number.isFinite(seconds)||seconds<0||!Number.isFinite(recipe.duration)||recipe.duration<=0||!Number.isFinite(process.remaining)||process.remaining<0)throw Error('invalid_process_time');
+  for(const [,n] of [...entries(input),...entries(output),...entries(recipe.inputs),...entries(recipe.outputs)])if(!Number.isFinite(n)||n<0)throw Error('invalid_resource_quantity');
+  let left=seconds,completed=0,iterations=0;
+  while(left>1e-9){
+   if(++iterations>10000)throw Error('process_step_too_large');
+   if(process.remaining<=1e-9){
+    if(entries(recipe.inputs).some(([k,n])=>(input[k]||0)<n))break;
+    for(const [k,n] of entries(recipe.inputs))input[k]=(input[k]||0)-n;
+    process.remaining=recipe.duration;
+   }
+   const used=Math.min(left,process.remaining);left-=used;process.remaining-=used;
+   if(process.remaining<=1e-9){process.remaining=0;for(const [k,n] of entries(recipe.outputs))output[k]=(output[k]||0)+n;completed++;}
+  }
+  return {completed,unusedSeconds:left};
+ }
+ root.ByveAppRuntime=Object.freeze({version:4,createModel,copy,bindActions,advanceRecipe,
+  snapDelta:(dx,dy,grid=0)=>{if(![dx,dy,grid].every(Number.isFinite)||grid<0)throw Error('invalid_drag_delta');return grid?{dx:Math.round(dx/grid)*grid,dy:Math.round(dy/grid)*grid}:{dx,dy};},
+  escapeHtml:value=>String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])),
+  selectForDrag:(selected,id)=>Array.from(new Set(selected)).includes(id)?Array.from(new Set(selected)):[id],
+  snapshotIds:ids=>Array.from(new Set(ids))
+ });
+})(typeof globalThis!=="undefined"?globalThis:window);</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0A0D10">
+<title>ArnØ | آرنو — Pure Design, Premium Marketing</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%2339FF14'/%3E%3Cstop offset='100%25' stop-color='%23C0C7D0'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='%230A0D10'/%3E%3Cpath d='M32 7 54 19.5v25L32 57 10 44.5v-25Z' fill='%2312161B' stroke='url(%23g)' stroke-width='2.5'/%3E%3Cpath d='M20 44 32 18 44 44h-6.5l-5.5-12.5L26.5 44H20Z' fill='%2339FF14'/%3E%3Ccircle cx='32' cy='35' r='3.2' fill='%23E8EDF2'/%3E%3C/svg%3E">
+<link rel="byve-font" href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800;900&display=swap"><script data-byve-server-font-loader>(function(){var d=document,w=window;if(w.__byveFontLoader)return;w.__byveFontLoader=1;var touch=function(){var h=d.head||d.documentElement,c=d.createComment('');h.appendChild(c);h.removeChild(c)};var go=function(){if(d.fonts&&d.fonts.addEventListener)d.fonts.addEventListener('loadingdone',touch);var l=d.querySelectorAll('link[rel="byve-font"]');for(var i=0;i<l.length;i++)l[i].setAttribute('rel','stylesheet')};var later=function(){w.setTimeout(go,0)};if(d.readyState==='complete')later();else w.addEventListener('load',later)})();</script>
+<style>
+:root{
+ --bg:#0A0D10;--bg-2:#12161B;--surface:rgba(20,25,32,.78);--surface-solid:#141920;
+ --surface-2:rgba(28,34,43,.88);--ink:#EEF2F6;--muted:#9BA5B4;
+ --silver:#C0C7D0;--line:rgba(192,199,208,.18);--line-strong:rgba(192,199,208,.34);
+ --neon:#39FF14;--neon-2:#5CFF00;--neon-soft:rgba(57,255,20,.12);
+ --neon-glow:0 0 24px rgba(57,255,20,.28);--danger:#FF5E5E;--warn:#FFB020;
+ --nav:72px;--radius:22px
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{scroll-behavior:smooth;background:var(--bg);color-scheme:dark}
+body{
+ margin:0;background:radial-gradient(circle at 82% 8%,rgba(57,255,20,.09),transparent 36%),
+ radial-gradient(circle at 15% 88%,rgba(192,199,208,.07),transparent 40%),var(--bg);
+ color:var(--ink);font-family:Vazirmatn,Tahoma,sans-serif;line-height:1.75;overflow-x:hidden
+}
+button,input,textarea,select{font:inherit;color:inherit}
+button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{
+ outline:2px solid var(--neon);outline-offset:2px
+}
+button:disabled{opacity:.5;cursor:not-allowed}
+#app{min-height:100dvh;position:relative;display:flex;flex-direction:column}
+
+/* Metallic ArnØ Wordmark */
+.arno-wordmark{
+ font-weight:900;letter-spacing:-.5px;direction:ltr;display:inline-flex;align-items:center;gap:2px;
+ background:linear-gradient(135deg,#FFFFFF 0%,#C0C7D0 45%,#7D8692 65%,#F5F8FA 100%);
+ -webkit-background-clip:text;background-clip:text;color:transparent;
+ text-shadow:0 0 18px rgba(57,255,20,.22)
+}
+.arno-wordmark .slash-o{
+ color:var(--neon);-webkit-text-fill-color:var(--neon);
+ filter:drop-shadow(0 0 8px rgba(57,255,20,.75))
+}
+
+/* Topbar */
+.topbar{
+ position:sticky;top:0;z-index:30;background:rgba(10,13,16,.84);backdrop-filter:blur(18px);
+ border-bottom:1px solid var(--line)
+}
+.topbar-inner{
+ width:min(1160px,calc(100% - 28px));min-height:66px;margin:auto;
+ display:flex;align-items:center;justify-content:space-between;gap:12px
+}
+.brand{display:flex;align-items:center;gap:11px;text-decoration:none;color:var(--ink)}
+.brand-mark{width:40px;height:40px;flex:none;filter:drop-shadow(0 0 10px rgba(57,255,20,.35))}
+.brand-text{display:flex;flex-direction:column;line-height:1.15}
+.brand-sub{font-size:10px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase}
+.top-actions{display:flex;align-items:center;gap:8px}
+.page-pill{
+ font-size:12px;color:var(--silver);background:rgba(255,255,255,.04);
+ border:1px solid var(--line);padding:6px 12px;border-radius:999px
+}
+
+/* Buttons */
+.icon-btn,.nav-btn,.button{
+ min-height:44px;border:1px solid var(--line);background:var(--surface);border-radius:14px;
+ display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:9px 16px;
+ cursor:pointer;text-decoration:none;font-weight:600;
+ transition:transform .2s cubic-bezier(.2,.8,.2,1),border-color .2s,background .2s,box-shadow .2s,color .2s
+}
+.icon-btn{width:44px;padding:0}
+.icon-btn svg,.nav-btn svg{width:20px;height:20px;flex:none}
+.button:hover,.icon-btn:hover{border-color:var(--neon);transform:translateY(-1px);box-shadow:0 6px 20px rgba(57,255,20,.14)}
+.button.primary{
+ background:linear-gradient(135deg,var(--neon),var(--neon-2));border-color:var(--neon);
+ color:#071005;font-weight:800;box-shadow:0 0 22px rgba(57,255,20,.28)
+}
+.button.primary:hover{box-shadow:0 0 32px rgba(57,255,20,.48);background:var(--neon)}
+.button.soft{background:rgba(255,255,255,.03);border-color:var(--line-strong);color:var(--ink)}
+.button.soft:hover{background:var(--neon-soft)}
+.button.danger{color:#FFB4B4;border-color:rgba(255,94,94,.35);background:rgba(255,94,94,.08)}
+.button.danger:hover{border-color:var(--danger);box-shadow:0 0 18px rgba(255,94,94,.2)}
+.button.small{min-height:38px;padding:7px 13px;font-size:13px;border-radius:11px}
+
+/* Layout & Glass Panels */
+main#main{flex:1;padding-bottom:calc(var(--nav) + env(safe-area-inset-bottom) + 18px)}
+.page{width:min(1160px,calc(100% - 28px));margin:0 auto;padding:24px 0 32px;animation:pageIn .42s cubic-bezier(.2,.8,.2,1) both}
+@keyframes pageIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.kicker{
+ display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:800;
+ color:var(--neon);letter-spacing:.06em;text-transform:uppercase
+}
+.kicker::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--neon);box-shadow:0 0 10px var(--neon)}
+h1,h2,h3,p{margin-top:0}
+.page-heading{margin:4px 0 24px}
+.page-heading h1{font-size:clamp(26px,5.5vw,42px);line-height:1.25;margin:8px 0 10px;font-weight:900}
+.page-heading p{max-width:680px;color:var(--muted);margin:0}
+.panel,.glass-card{
+ background:var(--surface);backdrop-filter:blur(16px);border:1px solid var(--line);
+ border-radius:var(--radius);padding:22px;box-shadow:0 16px 40px rgba(0,0,0,.35)
+}
+.panel h2{font-size:20px;margin:0 0 8px}
+
+/* Auth Gate Screen */
+.auth-gate{
+ min-height:calc(100dvh - 80px);display:grid;place-items:center;padding:24px 14px;
+ position:relative;overflow:hidden
+}
+.auth-gate-card{
+ width:min(460px,100%);background:rgba(16,21,27,.88);backdrop-filter:blur(22px);
+ border:1px solid var(--line-strong);border-radius:28px;padding:28px 24px;
+ box-shadow:0 24px 70px rgba(0,0,0,.65),0 0 40px rgba(57,255,20,.08);
+ position:relative;z-index:2;animation:gateIn .55s cubic-bezier(.2,.8,.2,1) both
+}
+@keyframes gateIn{from{opacity:0;transform:scale(.96) translateY(16px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.gate-logo{display:flex;flex-direction:column;align-items:center;text-align:center;margin-bottom:22px}
+.gate-logo svg{width:74px;height:74px;margin-bottom:10px;filter:drop-shadow(0 0 20px rgba(57,255,20,.45));animation:pulseLogo 3.6s ease-in-out infinite}
+@keyframes pulseLogo{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-4px) scale(1.03)}}
+.gate-logo .arno-wordmark{font-size:32px}
+.gate-logo p{color:var(--muted);font-size:13px;margin:4px 0 0}
+.gate-footer-switch{
+ margin-top:18px;padding-top:16px;border-top:1px solid var(--line);
+ display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:13px;color:var(--muted)
+}
+
+/* Forms */
+.field-label{display:block;font-size:13px;font-weight:700;color:var(--silver);margin:14px 0 6px}
+input[type=text],input[type=email],input[type=password],textarea,select{
+ width:100%;min-height:46px;background:rgba(10,13,16,.78);border:1px solid var(--line-strong);
+ border-radius:13px;padding:10px 14px;color:var(--ink);transition:border-color .2s,box-shadow .2s
+}
+input:focus,textarea:focus,select:focus{border-color:var(--neon);box-shadow:0 0 0 3px rgba(57,255,20,.14)}
+textarea{min-height:106px;resize:vertical}
+.form-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.form-actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:16px}
+.field-note,.muted{color:var(--muted);font-size:12px}
+.status{min-height:22px;margin:10px 0 0;font-size:13px;color:var(--neon)}
+.status.error{color:#FF7A7A}
+.status.success{color:var(--neon)}
+.recovery{
+ margin:12px 0;padding:13px;border:1px solid rgba(255,176,32,.4);border-radius:13px;
+ background:rgba(255,176,32,.08);color:#FFD480;font-size:13px
+}
+
+/* Hero & Stepwise Home Showcase */
+.hero-shell{
+ position:relative;overflow:hidden;border-radius:28px;border:1px solid var(--line-strong);
+ background:linear-gradient(145deg,rgba(18,22,27,.95),rgba(10,13,16,.98));
+ padding:34px 28px;margin-bottom:28px;
+ box-shadow:0 28px 80px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.08)
+}
+.hero-shell::before{
+ content:"";position:absolute;inset:-40% -20% auto auto;width:440px;height:440px;border-radius:50%;
+ background:radial-gradient(circle,rgba(57,255,20,.16),transparent 65%);pointer-events:none;
+ animation:orbitGlow 9s ease-in-out infinite alternate
+}
+@keyframes orbitGlow{from{transform:translate(0,0)}to{transform:translate(-30px,24px)}}
+.hero-grid{
+ display:grid;grid-template-columns:minmax(0,1.1fr) minmax(240px,.9fr);gap:28px;align-items:center;
+ position:relative;z-index:1
+}
+.hero-title{font-size:clamp(30px,6vw,56px);line-height:1.18;font-weight:900;margin:12px 0 14px}
+.hero-title em{font-style:normal;color:var(--neon);text-shadow:0 0 22px rgba(57,255,20,.35)}
+.hero-desc{color:#C7D0DC;font-size:clamp(14px,2vw,17px);max-width:560px}
+.hero-visual{display:flex;flex-direction:column;align-items:center;justify-content:center}
+.hero-emblem{
+ width:min(100%,300px);animation:emblemArrive .9s cubic-bezier(.16,1,.3,1) both
+}
+@keyframes emblemArrive{from{opacity:0;transform:scale(.82) rotate(-6deg)}to{opacity:1;transform:scale(1) rotate(0)}}
+.hero-emblem svg{width:100%;height:auto;filter:drop-shadow(0 0 28px rgba(57,255,20,.32))}
+.hero-slogan{
+ margin-top:10px;font-size:12px;letter-spacing:.14em;color:var(--silver);text-transform:uppercase;
+ direction:ltr;text-align:center
+}
+
+/* Step-by-step Value Journey on Home */
+.journey-section{margin:34px 0}
+.section-head{display:flex;align-items:end;justify-content:space-between;gap:14px;margin-bottom:18px;flex-wrap:wrap}
+.section-head h2{font-size:clamp(22px,4.5vw,32px);margin:6px 0 0;font-weight:900}
+.section-head p{color:var(--muted);max-width:480px;margin:0}
+.step-cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.step-card{
+ background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:20px;
+ display:flex;flex-direction:column;gap:12px;position:relative;overflow:hidden;
+ transition:transform .25s ease,border-color .25s ease,box-shadow .25s ease
+}
+.step-card:hover{transform:translateY(-4px);border-color:var(--neon);box-shadow:0 14px 36px rgba(57,255,20,.12)}
+.step-num{
+ width:34px;height:34px;border-radius:10px;background:var(--neon-soft);border:1px solid rgba(57,255,20,.4);
+ color:var(--neon);display:grid;place-items:center;font-weight:900;font-size:14px
+}
+.step-art{
+ width:100%;height:130px;border-radius:14px;overflow:hidden;border:1px solid var(--line);
+ background:linear-gradient(135deg,#10151c,#19222d)
+}
+.step-art svg{width:100%;height:100%;display:block}
+.step-card h3{font-size:17px;margin:0;color:var(--ink)}
+.step-card p{font-size:13px;color:var(--muted);margin:0}
+
+/* Creative Showcase Gallery on Home */
+.visual-showcase{
+ display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin:28px 0
+}
+.showcase-card{
+ background:var(--surface);border:1px solid var(--line);border-radius:22px;overflow:hidden;
+ display:flex;flex-direction:column
+}
+.showcase-media{height:185px;position:relative;overflow:hidden;background:#0d1217;border-bottom:1px solid var(--line)}
+.showcase-media svg{width:100%;height:100%;display:block}
+.showcase-body{padding:18px}
+.showcase-body h3{font-size:17px;margin:6px 0}
+.showcase-body p{font-size:13px;color:var(--muted);margin:0}
+
+.home-nav-hint{
+ margin-top:28px;padding:22px;border-radius:22px;border:1px dashed rgba(57,255,20,.45);
+ background:linear-gradient(135deg,rgba(57,255,20,.08),rgba(18,22,27,.9));
+ display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap
+}
+.home-nav-hint p{margin:0;color:var(--ink);font-size:14px}
+
+/* Services Page */
+.tier-badge{
+ display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;
+ font-size:11px;font-weight:800;background:var(--neon-soft);color:var(--neon);
+ border:1px solid rgba(57,255,20,.35);margin-bottom:8px
+}
+.service-grid{display:grid;gap:14px}
+.service-card{
+ display:grid;grid-template-columns:140px minmax(0,1fr) auto;gap:18px;align-items:center;
+ padding:18px;border:1px solid var(--line);border-radius:22px;background:var(--surface);
+ transition:border-color .22s ease,transform .22s ease,box-shadow .22s ease
+}
+.service-card:hover{border-color:var(--line-strong);transform:translateY(-2px)}
+.service-card.selected{
+ border-color:var(--neon);box-shadow:0 0 0 1px var(--neon),0 14px 36px rgba(57,255,20,.14)
+}
+.service-thumb{
+ width:140px;height:104px;border-radius:15px;overflow:hidden;border:1px solid var(--line);
+ background:#0e1318
+}
+.service-thumb svg{width:100%;height:100%;display:block}
+.service-card h2{font-size:19px;margin:0 0 6px}
+.service-card p{color:var(--muted);font-size:14px;margin:0}
+
+/* Before/After Neon Comparison Slider */
+.ba-box{
+ margin-top:16px;padding:18px;border-radius:22px;border:1px solid var(--line-strong);
+ background:var(--surface)
+}
+.ba-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+.ba-stage{
+ position:relative;height:210px;border-radius:16px;overflow:hidden;border:1px solid var(--line);
+ user-select:none;touch-action:none;background:#0c1015
+}
+.ba-layer{position:absolute;inset:0;width:100%;height:100%}
+.ba-after{clip-path:inset(0 0 0 50%)}
+.ba-divider{
+ position:absolute;top:0;bottom:0;left:50%;width:2px;background:var(--neon);
+ box-shadow:0 0 14px var(--neon);pointer-events:none
+}
+.ba-handle{
+ position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+ width:34px;height:34px;border-radius:50%;background:#0A0D10;border:2px solid var(--neon);
+ color:var(--neon);display:grid;place-items:center;font-size:12px;font-weight:900;
+ box-shadow:0 0 16px rgba(57,255,20,.55);pointer-events:none
+}
+.ba-range{width:100%;margin-top:10px;accent-color:var(--neon);cursor:ew-resize}
+.ba-labels{display:flex;justify-content:space-between;font-size:11px;color:var(--silver);margin-top:4px}
+
+.order-panel{
+ margin-top:20px;padding:24px;border-radius:24px;
+ background:linear-gradient(155deg,rgba(24,31,39,.95),rgba(14,18,23,.95));
+ border:1px solid rgba(57,255,20,.3);box-shadow:0 18px 46px rgba(0,0,0,.4)
+}
+.extra-services{
+ margin-top:20px;padding:22px;border-radius:22px;background:var(--surface);border:1px solid var(--line)
+}
+.extra-services h2{color:var(--neon);font-size:20px;margin:0 0 8px}
+
+/* Contact Page Animations */
+.ticket-hero{
+ display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:16px;
+ padding:24px;border-radius:24px;
+ background:linear-gradient(135deg,rgba(57,255,20,.14),rgba(18,22,27,.94));
+ border:1px solid rgba(57,255,20,.45);box-shadow:0 16px 40px rgba(0,0,0,.4);
+ animation:ticketPulseIn .55s cubic-bezier(.2,.8,.2,1) both
+}
+@keyframes ticketPulseIn{from{opacity:0;transform:translateY(16px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
+.contact-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px;margin-top:18px}
+.contact-item{
+ width:100%;text-align:start;min-height:82px;padding:16px;border:1px solid var(--line);
+ border-radius:18px;background:var(--surface);cursor:pointer;
+ opacity:0;transform:translateY(22px);
+ transition:transform .35s cubic-bezier(.2,.8,.2,1),opacity .35s ease,border-color .2s,box-shadow .2s
+}
+.contact-item.revealed{opacity:1;transform:translateY(0)}
+.contact-item:hover{border-color:var(--neon);box-shadow:0 10px 26px rgba(57,255,20,.14);transform:translateY(-2px)}
+.contact-item b{display:block;font-size:14px;color:var(--ink);margin-bottom:3px}
+.contact-item span{display:block;color:var(--neon);font-size:13px;direction:ltr;text-align:right;overflow-wrap:anywhere}
+
+/* Profile & Records */
+.profile-layout{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:16px;align-items:start}
+.account-head{display:flex;align-items:center;gap:14px;margin-bottom:16px}
+.avatar{
+ width:78px;height:78px;border-radius:24px;background:var(--neon-soft);border:1px solid rgba(57,255,20,.45);
+ color:var(--neon);display:grid;place-items:center;overflow:hidden;flex:none;font-size:26px;font-weight:900
+}
+.avatar img{width:100%;height:100%;object-fit:cover}
+.account-head b{display:block;font-size:18px}
+.account-head p{margin:0;color:var(--muted);font-size:13px}
+.profile-orders{display:grid;gap:10px;margin-top:12px}
+.record{
+ padding:15px;border:1px solid var(--line);border-radius:16px;background:rgba(12,16,20,.72)
+}
+.record h3{font-size:15px;margin:0 0 5px;color:var(--ink)}
+.record p{font-size:13px;color:var(--silver);margin:0 0 8px;white-space:pre-wrap;overflow-wrap:anywhere}
+.record small{display:block;color:var(--muted)}
+.record-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+
+/* Dedicated Separate Admin Panel */
+.admin-shell{
+ border:1px solid rgba(57,255,20,.4);border-radius:26px;padding:24px;
+ background:linear-gradient(165deg,rgba(18,24,30,.96),rgba(10,13,16,.98));
+ box-shadow:0 24px 64px rgba(0,0,0,.55)
+}
+.admin-header{
+ display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
+ padding-bottom:18px;border-bottom:1px solid var(--line)
+}
+.admin-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:18px 0}
+.stat-box{
+ background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:16px;padding:14px
+}
+.stat-box b{display:block;font-size:22px;color:var(--neon)}
+.stat-box span{font-size:12px;color:var(--muted)}
+.admin-tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px}
+.admin-tabs .button.active{background:var(--neon);border-color:var(--neon);color:#071005;font-weight:800}
+.admin-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+
+/* FAQ */
+.faq-list{display:grid;gap:10px}
+details{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:0 16px}
+summary{cursor:pointer;padding:15px 0;font-weight:700;color:var(--ink)}
+details p{color:var(--muted);margin:0 0 15px}
+
+/* Bottom Navigation */
+.bottom-nav{
+ position:fixed;z-index:28;inset:auto 0 0;background:rgba(10,13,16,.92);backdrop-filter:blur(18px);
+ border-top:1px solid var(--line);padding:6px 10px calc(6px + env(safe-area-inset-bottom));
+ display:grid;grid-template-columns:repeat(4,minmax(0,1fr));min-height:var(--nav)
+}
+.nav-btn{
+ border:0;background:transparent;min-width:0;min-height:52px;padding:4px;
+ display:flex;flex-direction:column;gap:2px;color:var(--muted);font-size:11px;border-radius:14px
+}
+.nav-btn[aria-current=page]{color:var(--neon);background:var(--neon-soft);font-weight:800}
+.nav-btn[aria-current=page] svg{filter:drop-shadow(0 0 6px rgba(57,255,20,.65))}
+
+/* Drawer */
+.drawer{
+ position:fixed;z-index:50;inset:0 0 0 auto;width:min(340px,88vw);height:100dvh;overflow:auto;
+ background:rgba(14,18,23,.97);backdrop-filter:blur(22px);border-inline-start:1px solid var(--line-strong);
+ padding:22px;box-shadow:-24px 0 70px rgba(0,0,0,.7)
+}
+.menu-shade{position:fixed;z-index:45;inset:0;background:rgba(4,6,8,.76);backdrop-filter:blur(4px)}
+
+.toast{
+ position:fixed;z-index:60;inset:auto 50% calc(var(--nav) + 14px) auto;transform:translateX(50%);
+ max-width:calc(100vw - 28px);background:#121920;color:var(--ink);border:1px solid var(--neon);
+ border-radius:14px;padding:10px 16px;box-shadow:0 10px 30px rgba(0,0,0,.55);font-size:13px;
+ opacity:0;pointer-events:none;transition:opacity .2s ease,transform .2s ease
+}
+.toast.show{opacity:1;transform:translate(50%,-4px)}
+.site-foot{padding:18px 0;text-align:center;color:var(--muted);font-size:12px}
+
+@media(max-width:860px){
+ .hero-grid,.profile-layout{grid-template-columns:minmax(0,1fr)}
+ .hero-visual{order:-1}
+ .step-cards,.visual-showcase{grid-template-columns:minmax(0,1fr)}
+ .service-card{grid-template-columns:minmax(0,1fr)}
+ .service-thumb{width:100%;height:140px}
+ .admin-stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:640px){
+ .hero-shell{padding:22px 18px;border-radius:22px}
+ .admin-grid,.form-row,.contact-list,.ticket-hero{grid-template-columns:minmax(0,1fr)}
+ .page-pill{display:none}
+}
+@media(prefers-reduced-motion:reduce){
+ *,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;
+ animation-iteration-count:1!important;transition-duration:.01ms!important}
+}
+</style>
+</head>
+<body>
+<div id="app">
+<header class="topbar">
+ <div class="topbar-inner">
+  <a class="brand" href="#home" data-action="go-home" aria-label="ArnØ صفحه آغاز">
+   <svg class="brand-mark" viewBox="0 0 64 64" aria-hidden="true">
+    <defs>
+     <linearGradient id="topLogoGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#39FF14"/><stop offset="100%" stop-color="#C0C7D0"/>
+     </linearGradient>
+    </defs>
+    <path d="M32 5 55 18v28L32 59 9 46V18Z" fill="#12161B" stroke="url(#topLogoGrad)" stroke-width="2.5"/>
+    <path d="M19 45 32 17 45 45h-6.5l-6.5-14-6.5 14H19Z" fill="#39FF14"/>
+    <circle cx="32" cy="36" r="3" fill="#EEF2F6"/>
+   </svg>
+   <span class="brand-text">
+    <span class="arno-wordmark" style="font-size:21px">Arn<span class="slash-o">Ø</span></span>
+    <span class="brand-sub">Pure Design · Premium Marketing</span>
+   </span>
+  </a>
+  <span class="page-pill" id="pageTitle">استودیو خلاقیت و رشد دیجیتال</span>
+  <div class="top-actions">
+   <button class="icon-btn" type="button" data-action="menu" aria-label="باز کردن منو">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true">
+     <path d="M4 7h16M4 12h16M4 17h16"/>
+    </svg>
+   </button>
+  </div>
+ </div>
+</header>
+
+<main id="main">
+ <!-- AUTH ENTRY SCREEN (Shown before login) -->
+ <section class="auth-gate" id="authGatePage" data-page="auth" hidden>
+  <div class="auth-gate-card">
+   <div class="gate-logo">
+    <svg viewBox="0 0 120 120" aria-hidden="true">
+     <defs>
+      <linearGradient id="gateHex" x1="0" y1="0" x2="1" y2="1">
+       <stop offset="0%" stop-color="#39FF14"/><stop offset="55%" stop-color="#C0C7D0"/><stop offset="100%" stop-color="#39FF14"/>
+      </linearGradient>
+     </defs>
+     <polygon points="60,8 106,34 106,86 60,112 14,86 14,34" fill="#12161B" stroke="url(#gateHex)" stroke-width="2.5"/>
+     <polygon points="60,20 94,40 94,80 60,100 26,80 26,40" fill="none" stroke="rgba(57,255,20,.28)" stroke-dasharray="4 4"/>
+     <path d="M36 82 60 32 84 82H72.5L60 55 47.5 82H36Z" fill="#39FF14"/>
+     <circle cx="60" cy="67" r="4.5" fill="#EEF2F6"/>
+    </svg>
+    <div class="arno-wordmark">Arn<span class="slash-o">Ø</span></div>
+    <p>Pure Design, Premium Marketing</p>
+   </div>
+
+   <form id="gateLoginForm">
+    <h1 style="font-size:20px;margin:0 0 4px">ورود به اپلیکیشن آرنو</h1>
+    <p class="field-note" style="margin:0 0 12px">با نام کاربری یا ایمیل و رمز عبور خود وارد شوید.</p>
+    <label class="field-label" for="gateLoginUser">نام کاربری یا ایمیل</label>
+    <input id="gateLoginUser" type="text" maxlength="120" autocomplete="username" placeholder="مثلاً ali یا ایمیل" required>
+    <label class="field-label" for="gateLoginPass">رمز عبور</label>
+    <input id="gateLoginPass" type="password" maxlength="120" autocomplete="current-password" placeholder="••••••••" required>
+    <div class="form-actions">
+     <button class="button primary" type="submit" style="width:100%">ورود به فضای آرنو</button>
+    </div>
+    <div class="gate-footer-switch">
+     <span>هنوز حساب کاربری ندارید؟</span>
+     <button class="button soft small" type="button" data-action="gate-mode" data-mode="register">ثبتنام</button>
+    </div>
+   </form>
+
+   <form id="gateRegisterForm" hidden>
+    <h1 style="font-size:20px;margin:0 0 4px">ثبتنام کاربر جدید</h1>
+    <p class="field-note" style="margin:0 0 12px">اطلاعات زیر را برای ساخت پنل شخصی تکمیل کنید.</p>
+    <label class="field-label" for="gateRegName">نام نمایشی</label>
+    <input id="gateRegName" type="text" maxlength="60" autocomplete="name" placeholder="نام و نام خانوادگی" required>
+    <label class="field-label" for="gateRegUser">نام کاربری</label>
+    <input id="gateRegUser" type="text" maxlength="32" autocomplete="username" placeholder="حداقل ۳ نویسه" required>
+    <label class="field-label" for="gateRegEmail">ایمیل</label>
+    <input id="gateRegEmail" type="email" maxlength="120" autocomplete="email" placeholder="name@example.com" required>
+    <label class="field-label" for="gateRegPass">رمز عبور</label>
+    <input id="gateRegPass" type="password" maxlength="120" autocomplete="new-password" placeholder="حداقل ۶ نویسه" required>
+    <label class="field-label" for="gateRegPhone">شماره تماس (اختیاری)</label>
+    <input id="gateRegPhone" type="text" maxlength="30" inputmode="tel" autocomplete="tel" placeholder="09...">
+    <div class="form-actions">
+     <button class="button primary" type="submit" style="width:100%">ثبتنام و ورود</button>
+    </div>
+    <div class="gate-footer-switch">
+     <span>قبلاً ثبتنام کردهاید؟</span>
+     <button class="button soft small" type="button" data-action="gate-mode" data-mode="login">بازگشت به ورود</button>
+    </div>
+   </form>
+   <p class="status" id="gateStatus" aria-live="polite"></p>
+  </div>
+ </section>
+
+ <!-- HOME PAGE (Shown after login) -->
+ <section class="page" id="homePage" data-page="home" hidden>
+  <div class="hero-shell">
+   <div class="hero-grid">
+    <div>
+     <div class="kicker" id="heroKickerText">استودیو خلاقیت و مهندسی برند</div>
+     <h1 class="hero-title" id="heroTitleText">طراحی <em>خالص</em>،<br>بازاریابی ممتاز.</h1>
+     <p class="hero-desc" id="heroCopy">از طراحی تجربههای دیجیتال تا بازاریابی هوشمند؛ همراهی دقیق برای برندهایی که میخواهند متفاوت دیده شوند و با اطمینان رشد کنند.</p>
+     <div class="hero-actions form-actions">
+      <button class="button primary" type="button" data-action="go-services">مشاهده خدمات</button>
+      <button class="button soft" type="button" data-action="go-contact">ارتباط و ثبت تیکت</button>
+     </div>
+    </div>
+    <div class="hero-visual">
+     <div class="hero-emblem" aria-label="نشان وکتور ArnØ">
+      <svg viewBox="0 0 360 360" role="img" aria-label="لوگوی وکتور آرنو">
+       <defs>
+        <linearGradient id="heroMetal" x1="40" y1="30" x2="320" y2="330" gradientUnits="userSpaceOnUse">
+         <stop offset="0%" stop-color="#EEF2F6"/><stop offset="50%" stop-color="#8B95A3"/><stop offset="100%" stop-color="#39FF14"/>
+        </linearGradient>
+        <filter id="neonFilter" x="-30%" y="-30%" width="160%" height="160%">
+         <feGaussianBlur stdDeviation="8" result="blur"/>
+         <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+       </defs>
+       <circle cx="180" cy="180" r="152" fill="none" stroke="rgba(192,199,208,.18)" stroke-width="1.2"/>
+       <circle cx="180" cy="180" r="126" fill="none" stroke="rgba(57,255,20,.32)" stroke-dasharray="3 10"/>
+       <polygon points="180,26 312,102 312,258 180,334 48,258 48,102" fill="rgba(18,22,27,.85)" stroke="url(#heroMetal)" stroke-width="2.4"/>
+       <path d="M98 248 180 86 262 248H216L180 175 144 248H98Z" fill="#39FF14" filter="url(#neonFilter)"/>
+       <polygon points="180,192 206,248 154,248" fill="#0A0D10"/>
+       <circle cx="278" cy="96" r="7" fill="#EEF2F6"/>
+       <circle cx="278" cy="96" r="16" fill="none" stroke="#39FF14" stroke-opacity=".6"/>
+      </svg>
+     </div>
+     <div class="hero-slogan">Pure Design · Premium Marketing</div>
+    </div>
+   </div>
+  </div>
+
+  <section class="journey-section" aria-labelledby="journeyTitle">
+   <div class="section-head">
+    <div>
+     <div class="kicker">مسیر مرحلهای خلق ارزش</div>
+     <h2 id="journeyTitle">چگونه برند شما را متمایز میکنیم؟</h2>
+    </div>
+    <p>هر پروژه در آرنو با دقت مهندسی، هویت بصری یکپارچه و استانداردهای روز اجرا میشود.</p>
+   </div>
+   <div class="step-cards">
+    <article class="step-card">
+     <div class="step-num">۰۱</div>
+     <div class="step-art">
+      <svg viewBox="0 0 320 140" aria-hidden="true">
+       <rect width="320" height="140" fill="#0D1217"/>
+       <circle cx="72" cy="70" r="42" fill="none" stroke="#39FF14" stroke-opacity=".5" stroke-width="1.5"/>
+       <circle cx="72" cy="70" r="22" fill="rgba(57,255,20,.16)" stroke="#39FF14" stroke-width="1.5"/>
+       <path d="M136 48h140M136 70h110M136 92h86" stroke="#C0C7D0" stroke-width="4" stroke-linecap="round" stroke-opacity=".75"/>
+       <circle cx="246" cy="70" r="5" fill="#39FF14"/>
+      </svg>
+     </div>
+     <h3>شناخت و راهبرد</h3>
+     <p>تحلیل دقیق بازار، مخاطب هدف و تدوین نقشه راه اختصاصی برای جایگاهسازی برند.</p>
+    </article>
+    <article class="step-card">
+     <div class="step-num">۰۲</div>
+     <div class="step-art">
+      <svg viewBox="0 0 320 140" aria-hidden="true">
+       <rect width="320" height="140" fill="#0D1217"/>
+       <rect x="26" y="24" width="120" height="92" rx="12" fill="#17202A" stroke="#C0C7D0" stroke-opacity=".45"/>
+       <rect x="40" y="38" width="92" height="14" rx="4" fill="#39FF14" fill-opacity=".85"/>
+       <rect x="40" y="62" width="58" height="40" rx="6" fill="rgba(192,199,208,.16)"/>
+       <path d="M168 96l34-44 26 24 38-52" fill="none" stroke="#39FF14" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+       <circle cx="266" cy="24" r="6" fill="#39FF14"/>
+      </svg>
+     </div>
+     <h3>طراحی و مهندسی</h3>
+     <p>پیادهسازی رابطهای کاربری لوکس، سریع و کاملاً واکنشگرا برای موبایل و دسکتاپ.</p>
+    </article>
+    <article class="step-card">
+     <div class="step-num">۰۳</div>
+     <div class="step-art">
+      <svg viewBox="0 0 320 140" aria-hidden="true">
+       <rect width="320" height="140" fill="#0D1217"/>
+       <path d="M32 110h256" stroke="#C0C7D0" stroke-opacity=".35" stroke-width="2"/>
+       <rect x="52" y="76" width="28" height="34" rx="5" fill="rgba(192,199,208,.25)"/>
+       <rect x="102" y="58" width="28" height="52" rx="5" fill="rgba(192,199,208,.4)"/>
+       <rect x="152" y="42" width="28" height="68" rx="5" fill="rgba(57,255,20,.45)"/>
+       <rect x="202" y="24" width="28" height="86" rx="5" fill="#39FF14"/>
+       <circle cx="266" cy="34" r="14" fill="rgba(57,255,20,.16)" stroke="#39FF14" stroke-width="2"/>
+      </svg>
+     </div>
+     <h3>تحویل و رشد</h3>
+     <p>بهینهسازی مداوم، کمپینهای بازاریابی هدفمند و پشتیبانی فنی برای رشد پایدار.</p>
+    </article>
+   </div>
+  </section>
+
+  <section class="visual-showcase" aria-label="پیش نمایش استودیو آرنو">
+   <article class="showcase-card">
+    <div class="showcase-media">
+     <svg viewBox="0 0 460 190" aria-hidden="true">
+      <defs>
+       <linearGradient id="sc1" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#111922"/><stop offset="100%" stop-color="#0A0D10"/>
+       </linearGradient>
+      </defs>
+      <rect width="460" height="190" fill="url(#sc1)"/>
+      <rect x="34" y="26" width="250" height="138" rx="14" fill="#18212C" stroke="#C0C7D0" stroke-opacity=".35"/>
+      <rect x="50" y="44" width="110" height="10" rx="5" fill="#39FF14"/>
+      <rect x="50" y="66" width="218" height="56" rx="8" fill="rgba(255,255,255,.04)" stroke="rgba(57,255,20,.3)"/>
+      <rect x="306" y="44" width="120" height="120" rx="18" fill="#121820" stroke="#39FF14" stroke-opacity=".55"/>
+      <circle cx="366" cy="94" r="24" fill="rgba(57,255,20,.18)" stroke="#39FF14"/>
+      <path d="M354 128h24" stroke="#C0C7D0" stroke-width="4" stroke-linecap="round"/>
+     </svg>
+    </div>
+    <div class="showcase-body">
+     <div class="kicker">تجربه وب و موبایل</div>
+     <h3 id="showcaseTitleText">هویت یکپارچه، تجربهای بهیادماندنی</h3>
+     <p id="showcaseDescText">ترکیب زیبایی بصری، سرعت بالا و معماری تمیز کد برای تبدیل بازدیدکنندگان به مشتریان وفادار.</p>
+    </div>
+   </article>
+   <article class="showcase-card">
+    <div class="showcase-media">
+     <svg viewBox="0 0 460 190" aria-hidden="true">
+      <rect width="460" height="190" fill="#0C1117"/>
+      <circle cx="140" cy="95" r="64" fill="rgba(57,255,20,.1)" stroke="#39FF14" stroke-opacity=".5"/>
+      <polygon points="128,74 168,95 128,116" fill="#39FF14"/>
+      <rect x="236" y="40" width="186" height="24" rx="7" fill="#1A222D" stroke="#C0C7D0" stroke-opacity=".3"/>
+      <rect x="236" y="80" width="150" height="24" rx="7" fill="#1A222D" stroke="#39FF14" stroke-opacity=".45"/>
+      <rect x="236" y="120" width="186" height="24" rx="7" fill="#1A222D" stroke="#C0C7D0" stroke-opacity=".3"/>
+     </svg>
+    </div>
+    <div class="showcase-body">
+     <div class="kicker">تولید و پرداخت محتوا</div>
+     <h3>محتوای بصری در تراز برندهای پیشرو</h3>
+     <p>تدوین، اصلاح رنگ و ویرایش تخصصی عکس و ویدئو هماهنگ با لحن و هویت برند شما.</p>
+    </div>
+   </article>
+  </section>
+
+  <aside class="home-nav-hint">
+   <p>خدمات آرنو تنها به این پیشنمایش محدود نیست! برای مشاهده فهرست کامل خدمات، ثبت سفارش ترکیبی یا ارتباط مستقیم، از <strong>منوهای پایین</strong> یا <strong>منوی همبرگری بالا</strong> استفاده کنید.</p>
+   <button class="button primary small" type="button" data-action="go-services">رفتن به صفحه خدمات</button>
+  </aside>
+ </section>
+
+ <!-- SERVICES PAGE -->
+ <section class="page" data-page="services" hidden>
+  <div class="page-heading">
+   <div class="kicker">خدمات تخصصی آرنو</div>
+   <h1>انتخاب و سفارش خدمات</h1>
+   <p id="servicesIntro">خدمتهای مورد نیازتان را بهصورت تکی یا ترکیبی انتخاب کنید و در انتهای صفحه سفارش خود را ثبت نمایید.</p>
+  </div>
+
+  <div class="service-grid">
+   <article class="service-card" data-service-card="وبسایت">
+    <div class="service-thumb">
+     <svg viewBox="0 0 180 130" aria-hidden="true">
+      <rect width="180" height="130" fill="#0B1015"/>
+      <rect x="16" y="18" width="148" height="94" rx="10" fill="#151D26" stroke="#39FF14" stroke-opacity=".55"/>
+      <rect x="28" y="32" width="60" height="10" rx="4" fill="#39FF14"/>
+      <rect x="28" y="52" width="124" height="44" rx="6" fill="rgba(192,199,208,.12)"/>
+     </svg>
+    </div>
+    <div>
+     <span class="tier-badge">ستون اصلی · رده ممتاز</span>
+     <h2>طراحی سایت و توسعه وب</h2>
+     <p id="serviceSiteText">وبسایتهای سریع، امن و واکنشگرا با تمرکز بر هویت برند، تجربه کاربری و تبدیل بهتر بازدیدکننده.</p>
+    </div>
+    <button class="button soft selection" type="button" data-action="select-service" data-service="طراحی سایت و توسعه وب" aria-pressed="false">انتخاب خدمت</button>
+   </article>
+
+   <article class="service-card" data-service-card="بازاریابی">
+    <div class="service-thumb">
+     <svg viewBox="0 0 180 130" aria-hidden="true">
+      <rect width="180" height="130" fill="#0B1015"/>
+      <path d="M24 98 L62 66 L96 80 L146 32" fill="none" stroke="#39FF14" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="146" cy="32" r="7" fill="#EEF2F6" stroke="#39FF14" stroke-width="2.5"/>
+     </svg>
+    </div>
+    <div>
+     <span class="tier-badge">ستون اصلی · رشد و برندینگ</span>
+     <h2>مدیریت بازاریابی</h2>
+     <p id="serviceMarketingText">راهبردی روشن برای ارتباط مؤثر با مخاطب، محتوای منسجم و رشد قابلاندازهگیری برند.</p>
+    </div>
+    <button class="button soft selection" type="button" data-action="select-service" data-service="مدیریت بازاریابی" aria-pressed="false">انتخاب خدمت</button>
+   </article>
+
+   <article class="service-card" data-service-card="محتوا">
+    <div class="service-thumb">
+     <svg viewBox="0 0 180 130" aria-hidden="true">
+      <rect width="180" height="130" fill="#0B1015"/>
+      <rect x="22" y="22" width="136" height="86" rx="10" fill="#171E27" stroke="#C0C7D0" stroke-opacity=".45"/>
+      <polygon points="78,48 112,65 78,82" fill="#39FF14"/>
+     </svg>
+    </div>
+    <div>
+     <span class="tier-badge">دسته مستقل · مدیا و تدوین</span>
+     <h2>ویرایش عکس و ویدئو</h2>
+     <p id="serviceMediaText">پرداخت حرفهای تصویر و ویدئو برای محتوایی هماهنگ با هویت بصری و کانالهای انتشار.</p>
+    </div>
+    <button class="button soft selection" type="button" data-action="select-service" data-service="ویرایش عکس و ویدئو" aria-pressed="false">انتخاب خدمت</button>
+   </article>
+  </div>
+
+  <!-- Interactive Before/After Slider -->
+  <div class="ba-box">
+   <div class="ba-head">
+    <div>
+     <div class="kicker">پیشنمایش تعاملی ویرایش</div>
+     <h3 style="margin:4px 0 0;font-size:17px">مقایسه کیفیت قبل و بعد از پرداخت بصری</h3>
+    </div>
+    <span class="field-note">اسلایدر را بکشید</span>
+   </div>
+   <div class="ba-stage" id="baStage">
+    <div class="ba-layer">
+     <svg viewBox="0 0 800 260" preserveAspectRatio="none" style="width:100%;height:100%">
+      <rect width="800" height="260" fill="#1E2228"/>
+      <circle cx="240" cy="130" r="76" fill="#39404A"/>
+      <rect x="370" y="65" width="320" height="36" rx="8" fill="#464E59"/>
+      <rect x="370" y="122" width="230" height="26" rx="8" fill="#3A414B"/>
+      <text x="40" y="42" fill="#9BA5B4" font-family="Vazirmatn" font-size="18">نسخه خام (Before)</text>
+     </svg>
+    </div>
+    <div class="ba-layer ba-after" id="baAfterLayer">
+     <svg viewBox="0 0 800 260" preserveAspectRatio="none" style="width:100%;height:100%">
+      <defs>
+       <linearGradient id="baGlow" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#0B130E"/><stop offset="100%" stop-color="#121B22"/>
+       </linearGradient>
+      </defs>
+      <rect width="800" height="260" fill="url(#baGlow)"/>
+      <circle cx="240" cy="130" r="76" fill="rgba(57,255,20,.16)" stroke="#39FF14" stroke-width="3"/>
+      <rect x="370" y="65" width="320" height="36" rx="8" fill="#39FF14"/>
+      <rect x="370" y="122" width="230" height="26" rx="8" fill="#C0C7D0"/>
+      <text x="580" y="42" fill="#39FF14" font-family="Vazirmatn" font-size="18" font-weight="bold">خروجی آرنو (After)</text>
+     </svg>
+    </div>
+    <div class="ba-divider" id="baDivider"></div>
+    <div class="ba-handle" id="baHandle">⇄</div>
+   </div>
+   <input class="ba-range" id="baRange" type="range" min="5" max="95" value="50" aria-label="اسلایدر مقایسه قبل و بعد">
+   <div class="ba-labels"><span>خروجی اصلاحشده ArnØ</span><span>تصویر خام اولیه</span></div>
+  </div>
+
+  <!-- Custom Package Builder & Order Form -->
+  <form class="order-panel" id="orderForm">
+   <h2>ساخت پکیج دلخواه و ثبت سفارش</h2>
+   <p class="field-note" id="selectedServices">هنوز خدمتی انتخاب نشده است.</p>
+   <label class="field-label" for="orderTitle">موضوع درخواست</label>
+   <input id="orderTitle" type="text" maxlength="100" placeholder="مثلاً طراحی وبسایت + مدیریت کمپین">
+   <label class="field-label" for="orderBody">توضیحات و نیاز پروژه</label>
+   <textarea id="orderBody" maxlength="3000" placeholder="اهداف، زمانبندی یا جزئیات پروژه را بنویسید…"></textarea>
+   <div class="form-actions">
+    <button class="button primary" type="submit">ثبت نهایی سفارش</button>
+    <button class="button soft small" type="button" data-action="save-package">ذخیره پیشنویس</button>
+    <button class="button soft small" type="button" data-action="load-package">بازیابی پیشنویس</button>
+   </div>
+   <p class="status" id="orderStatus" aria-live="polite"></p>
+   <p class="recovery" id="packageRecovery" hidden>پیشنویس قبلی قابل خواندن نیست؛ دادهٔ اصلی دستنخورده مانده است.</p>
+  </form>
+
+  <aside class="extra-services">
+   <div class="kicker">توضیحات بیشتر</div>
+   <h2>راهکارهای سفارشی و پشتیبانی اختصاصی</h2>
+   <p id="servicesMoreText">علاوه بر خدمات اصلی بالا، امکان طراحی هویت بصری کامل، سئو تکنیکال، تولید محتوای اختصاصی و مشاوره توسعه محصول نیز فراهم است. برای هماهنگی جزئیات خاص، از بخش ارتباط با ما تیکت ارسال کنید.</p>
+  </aside>
+ </section>
+
+ <!-- CONTACT PAGE -->
+ <section class="page" data-page="contact" hidden>
+  <div class="page-heading">
+   <div class="kicker">ارتباط مستقیم با تیم آرنو</div>
+   <h1>گفتوگو و ارسال تیکت</h1>
+   <p id="contactIntro">درخواست خود را بهصورت تیکت مستقیم برای مدیریت ثبت کنید یا از راههای ارتباطی زیر اقدام نمایید.</p>
+  </div>
+
+  <div class="ticket-hero">
+   <div>
+    <h2 style="margin:0 0 6px">نیاز به پیگیری یا مشاوره دارید؟</h2>
+    <p style="margin:0;color:var(--silver)">تیکت شما مستقیماً به پنل مدیریت ارسال میشود و پاسخ آن در پروفایل شما نمایش داده خواهد شد.</p>
+   </div>
+   <button class="button primary" type="button" data-action="ticket-contact">ارسال تیکت</button>
+  </div>
+
+  <section class="panel" id="contactTicketForm" hidden style="margin-top:16px">
+   <h2>ثبت تیکت پشتیبانی</h2>
+   <p class="field-note" id="ticketLoginHint">تیکت به پروفایل شما متصل میشود.</p>
+   <form id="contactTicket">
+    <label class="field-label" for="contactTicketTitle">موضوع</label>
+    <input id="contactTicketTitle" type="text" maxlength="100" placeholder="موضوع پیام">
+    <label class="field-label" for="contactTicketBody">شرح درخواست</label>
+    <textarea id="contactTicketBody" maxlength="3000" placeholder="متن پیام یا درخواست خود را بنویسید…"></textarea>
+    <div class="form-actions">
+     <button class="button primary" type="submit">ارسال به مدیریت</button>
+     <button class="button soft" type="button" data-action="cancel-ticket">انصراف</button>
+    </div>
+    <p class="status" id="contactTicketStatus" aria-live="polite"></p>
+   </form>
+  </section>
+
+  <div class="section-head" style="margin-top:34px">
+   <div>
+    <div class="kicker">راههای ارتباطی بیشتر</div>
+    <h2>کانالهای مستقیم ارتباط با آرنو</h2>
+   </div>
+   <p>با کلیک روی هر کارت، برنامه تماس، واتساپ یا ایمیل دستگاه شما با مقصد آماده باز میشود.</p>
+  </div>
+
+  <div class="contact-list" id="contactList">
+   <button class="contact-item" type="button" data-action="dial" data-value="09308893989">
+    <b>شماره تماس مدیرعامل</b><span>09308893989</span>
+   </button>
+   <button class="contact-item" type="button" data-action="whatsapp" data-value="09308893989">
+    <b>شماره واتساپ</b><span>09308893989</span>
+   </button>
+   <button class="contact-item" type="button" data-action="dial" data-value="09028595255">
+    <b>شماره پشتیبانی آرنو</b><span>09028595255</span>
+   </button>
+   <button class="contact-item" type="button" data-action="email" data-value="Arenbehrouzifar@gmail.com">
+    <b>ایمیل مدیرعامل</b><span>Arenbehrouzifar@gmail.com</span>
+   </button>
+   <button class="contact-item" type="button" data-action="email" data-value="Ceo.arno@hotmail.com">
+    <b>ایمیل مدیرعامل</b><span>Ceo.arno@hotmail.com</span>
+   </button>
+   <button class="contact-item" type="button" data-action="email" data-value="Ceo.arnoco@gmail.com">
+    <b>ایمیل مدیرعامل</b><span>Ceo.arnoco@gmail.com</span>
+   </button>
+   <button class="contact-item" type="button" data-action="email" data-value="Arno.io@hotmail.com">
+    <b>ایمیل پشتیبانی</b><span>Arno.io@hotmail.com</span>
+   </button>
+   <button class="contact-item" type="button" data-action="email" data-value="devteam.arno@gmail.com">
+    <b>ایمیل تیم توسعه آرنو</b><span>devteam.arno@gmail.com</span>
+   </button>
+  </div>
+  <p class="status" id="contactStatus" role="status" aria-live="polite"></p>
+ </section>
+
+ <!-- PROFILE PAGE -->
+ <section class="page" data-page="profile" hidden>
+  <div class="page-heading">
+   <div class="kicker">پنل کاربری شخصی</div>
+   <h1>پروفایل و درخواستهای من</h1>
+   <p>مدیریت اطلاعات حساب، آواتار دلخواه، پیگیری سفارشها و ثبت دیدگاه.</p>
+  </div>
+
+  <div class="profile-layout">
+   <section class="panel" id="accountPanel">
+    <div class="account-head">
+     <div class="avatar" id="avatarBox"><span id="avatarLetter">آ</span><img id="avatarImage" alt="عکس پروفایل" hidden></div>
+     <div><b id="profileName">مهمان</b><p id="profileSummary">برای دسترسی به امکانات شخصی وارد شوید.</p></div>
+    </div>
+
+    <div id="signedInArea" hidden>
+     <form id="profileEditForm">
+      <label class="field-label" for="editName">نام نمایشی</label>
+      <input id="editName" type="text" maxlength="60" autocomplete="name">
+      <label class="field-label" for="editEmail">ایمیل</label>
+      <input id="editEmail" type="email" maxlength="120" autocomplete="email">
+      <label class="field-label" for="editPhone">شماره تماس (اختیاری)</label>
+      <input id="editPhone" type="text" maxlength="30" inputmode="tel" autocomplete="tel">
+      <input id="avatarFileInput" type="file" accept="image/*" hidden>
+      <div class="form-actions">
+       <button class="button primary small" type="submit">ذخیره تغییرات</button>
+       <button class="button soft small" type="button" data-action="avatar">انتخاب عکس آواتار</button>
+       <button class="button soft small" type="button" data-action="logout">خروج از حساب</button>
+       <button class="button danger small" type="button" data-action="delete-account">حذف پروفایل</button>
+      </div>
+     </form>
+    </div>
+
+    <div id="authArea">
+     <p class="field-note">برای ورود یا ثبتنام به صفحه ورود منتقل شوید.</p>
+     <button class="button primary small" type="button" data-action="open-gate">صفحه ورود و ثبتنام</button>
+    </div>
+    <p class="status" id="authStatus" aria-live="polite"></p>
+    <div class="recovery" id="workspaceRecovery" hidden>
+     دادههای ذخیرهشده قابل خواندن نیستند؛ دادههای قبلی بازنویسی نشدهاند.
+    </div>
+   </section>
+
+   <div style="display:grid;gap:14px">
+    <section class="panel">
+     <h2>درخواستها و تیکتهای من</h2>
+     <p class="field-note">سفارشها و پاسخهای مدیریت در این بخش نمایش داده میشوند.</p>
+     <div class="profile-orders" id="myTickets"></div>
+    </section>
+
+    <section class="panel">
+     <h2>ثبت دیدگاه</h2>
+     <p class="field-note">دیدگاه شما پس از تأیید مدیر در بخش دیدگاههای کاربران منتشر میشود.</p>
+     <form id="reviewForm">
+      <label class="field-label" for="reviewText">متن دیدگاه</label>
+      <textarea id="reviewText" maxlength="1200" placeholder="تجربه همکاری یا نظر خود را بنویسید…"></textarea>
+      <div class="form-actions">
+       <button class="button soft small" type="submit">ارسال برای بررسی</button>
+      </div>
+     </form>
+     <p class="status" id="reviewStatus" aria-live="polite"></p>
+    </section>
+   </div>
+  </div>
+ </section>
+
+ <!-- DEDICATED ADMIN PANEL -->
+ <section class="page" id="adminPage" data-page="admin" hidden>
+  <div class="admin-shell">
+   <div class="admin-header">
+    <div>
+     <div class="kicker">مدیریت یکپارچه ArnØ</div>
+     <h1 style="margin:6px 0 4px;font-size:28px">پنل اختصاصی مدیریت</h1>
+     <p class="field-note" style="margin:0">دسترسی کامل به ویرایش متون اپلیکیشن، بررسی تیکتها، نظرات و کاربران.</p>
+    </div>
+    <div class="form-actions" style="margin:0">
+     <button class="button soft small" type="button" data-action="export-backup">خروجی پشتیبان JSON</button>
+     <button class="button danger small" type="button" data-action="admin-logout">خروج مدیر</button>
+    </div>
+   </div>
+
+   <div class="admin-stats" id="adminStats">
+    <div class="stat-box"><b id="statTickets">۰</b><span>کل تیکتها و سفارشها</span></div>
+    <div class="stat-box"><b id="statOpen">۰</b><span>در انتظار پاسخ</span></div>
+    <div class="stat-box"><b id="statReviews">۰</b><span>دیدگاه در انتظار تأیید</span></div>
+    <div class="stat-box"><b id="statProfiles">۰</b><span>کاربران ثبتشده</span></div>
+   </div>
+
+   <div class="admin-tabs">
+    <button class="button soft small active" type="button" data-action="admin-tab" data-tab="tickets">تیکتها و سفارشها</button>
+    <button class="button soft small" type="button" data-action="admin-tab" data-tab="content">ویرایش کل اپلیکیشن</button>
+    <button class="button soft small" type="button" data-action="admin-tab" data-tab="reviews">مدیریت دیدگاهها</button>
+    <button class="button soft small" type="button" data-action="admin-tab" data-tab="users">کاربران</button>
+   </div>
+
+   <div data-admin-panel="tickets">
+    <div class="profile-orders" id="adminTickets"></div>
+   </div>
+
+   <div data-admin-panel="content" hidden>
+    <form id="contentForm">
+     <div class="admin-grid">
+      <div>
+       <label class="field-label" for="editHeroKicker">برچسب بالای صفحه آغاز</label>
+       <input id="editHeroKicker" type="text" maxlength="120">
+      </div>
+      <div>
+       <label class="field-label" for="editShowcaseTitle">تیتر بخش نمایشگاه</label>
+       <input id="editShowcaseTitle" type="text" maxlength="120">
+      </div>
+     </div>
+     <label class="field-label" for="editHeroCopy">توضیح صفحه آغاز</label>
+     <textarea id="editHeroCopy" maxlength="500"></textarea>
+     <label class="field-label" for="editShowcaseDesc">متن بخش نمایشگاه</label>
+     <textarea id="editShowcaseDesc" maxlength="500"></textarea>
+     <label class="field-label" for="editServicesIntro">معرفی صفحه خدمات</label>
+     <textarea id="editServicesIntro" maxlength="500"></textarea>
+     <div class="admin-grid">
+      <div><label class="field-label" for="editSiteService">توضیح طراحی وب</label><textarea id="editSiteService" maxlength="500"></textarea></div>
+      <div><label class="field-label" for="editMarketingService">توضیح بازاریابی</label><textarea id="editMarketingService" maxlength="500"></textarea></div>
+     </div>
+     <label class="field-label" for="editMediaService">توضیح ویرایش عکس و ویدئو</label>
+     <textarea id="editMediaService" maxlength="500"></textarea>
+     <label class="field-label" for="editServicesMore">بخش توضیحات بیشتر خدمات</label>
+     <textarea id="editServicesMore" maxlength="500"></textarea>
+     <label class="field-label" for="editContactIntro">معرفی بخش ارتباط با ما</label>
+     <textarea id="editContactIntro" maxlength="500"></textarea>
+     <label class="field-label" for="editFinanceNote">متن بخش امور فایننس و فارکس</label>
+     <textarea id="editFinanceNote" maxlength="500"></textarea>
+     <div class="form-actions">
+      <button class="button primary" type="submit">ذخیره تمام تغییرات اپلیکیشن</button>
+     </div>
+    </form>
+   </div>
+
+   <div data-admin-panel="reviews" hidden>
+    <div class="profile-orders" id="adminReviews"></div>
+   </div>
+
+   <div data-admin-panel="users" hidden>
+    <div class="profile-orders" id="adminProfiles"></div>
+   </div>
+   <p class="status" id="adminStatus" aria-live="polite"></p>
+  </div>
+ </section>
+
+ <!-- FINANCE PAGE -->
+ <section class="page" data-page="finance" hidden>
+  <div class="page-heading">
+   <div class="kicker">بخش تخصصی</div>
+   <h1>امور فایننس و فارکس</h1>
+  </div>
+  <div class="panel">
+   <p id="financeBodyText">آرنو در زمینه آموزش مفاهیم پایه بازارهای مالی، مدیریت ریسک و تحلیل ساختاریافته بازار فارکس همراه علاقهمندان است.</p>
+   <p class="field-note">محتوای ارائهشده جنبه آموزشی و اطلاعرسانی دارد و جایگزین مشاوره مالی شخصی یا تضمین سود نیست.</p>
+  </div>
+ </section>
+
+ <!-- FAQ PAGE -->
+ <section class="page" data-page="faq" hidden>
+  <div class="page-heading">
+   <div class="kicker">پاسخهای سریع</div>
+   <h1>پرسشهای رایج</h1>
+  </div>
+  <div class="faq-list">
+   <details><summary>چطور سفارش یا پکیج دلخواه ثبت کنم؟</summary><p>از منوی پایین وارد بخش «خدمات» شوید، یک یا چند خدمت را انتخاب کرده و فرم انتهای صفحه را ثبت کنید.</p></details>
+   <details><summary>چطور به پشتیبانی تیکت بدهم؟</summary><p>در صفحه «ارتباط» دکمه «ارسال تیکت» را بزنید. پیام شما مستقیماً در پنل مدیریت ثبت میشود.</p></details>
+   <details><summary>آیا میتوانم عکس پروفایل بگذارم؟</summary><p>بله، در بخش «پروفایل» با زدن «انتخاب عکس آواتار» تصویر دلخواهتان را انتخاب کنید.</p></details>
+   <details><summary>اطلاعات حساب کجا ذخیره میشود؟</summary><p>تمام پروفایلها، سفارشها و تنظیمات روی حافظه امن همین مرورگر/دستگاه نگهداری میشوند.</p></details>
+  </div>
+ </section>
+
+ <!-- REVIEWS PAGE -->
+ <section class="page" data-page="reviews" hidden>
+  <div class="page-heading">
+   <div class="kicker">بازخورد مشتریان</div>
+   <h1>دیدگاه کاربران</h1>
+  </div>
+  <div class="profile-orders" id="approvedReviews"></div>
+ </section>
+
+ <div class="site-foot">ArnØ Agency · Pure Design, Premium Marketing</div>
+</main>
+
+<nav class="bottom-nav" id="bottomNav" aria-label="ناوبری اصلی">
+ <button class="nav-btn" type="button" data-action="navigate" data-page-target="home" aria-current="page">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m3 11 9-8 9 8v9h-6v-6H9v6H3z"/></svg><span>آغاز</span>
+ </button>
+ <button class="nav-btn" type="button" data-action="navigate" data-page-target="services">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M8 8h8M8 12h8M8 16h5"/></svg><span>خدمات</span>
+ </button>
+ <button class="nav-btn" type="button" data-action="navigate" data-page-target="contact">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 5h16v12H8l-4 3z"/><path d="M8 9h8M8 13h5"/></svg><span>ارتباط</span>
+ </button>
+ <button class="nav-btn" type="button" data-action="navigate" data-page-target="profile">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg><span>پروفایل</span>
+ </button>
+</nav>
+
+<aside class="drawer" id="drawer" hidden aria-label="منوی بیشتر">
+ <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding-bottom:16px;border-bottom:1px solid var(--line)">
+  <span class="arno-wordmark" style="font-size:22px">Arn<span class="slash-o">Ø</span></span>
+  <button class="icon-btn" type="button" data-action="close-menu" aria-label="بستن منو">×</button>
+ </div>
+ <div style="display:grid;gap:9px;margin-top:18px">
+  <button class="button soft" type="button" data-action="navigate" data-page-target="home">صفحه آغاز</button>
+  <button class="button soft" type="button" data-action="navigate" data-page-target="services">خدمات و سفارش</button>
+  <button class="button soft" type="button" data-action="navigate" data-page-target="contact">ارتباط با ما و تیکت</button>
+  <button class="button soft" type="button" data-action="navigate" data-page-target="reviews">دیدگاه کاربران</button>
+  <button class="button soft" type="button" data-action="navigate" data-page-target="faq">پرسشهای رایج</button>
+  <button class="button soft" type="button" data-action="navigate" data-page-target="profile">پروفایل کاربری</button>
+  <button class="button soft small" type="button" data-action="navigate" data-page-target="finance" style="margin-top:8px;opacity:.82">امور فایننس و فارکس</button>
+ </div>
+ <p class="field-note" style="margin-top:24px">Pure Design, Premium Marketing — استودیو خلاقیت آرنو</p>
+</aside>
+<div class="menu-shade" id="menuShade" hidden aria-hidden="true"></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+</div>
+
+<script>
+(function(){
+ const $=selector=>document.querySelector(selector);
+ const $$=selector=>Array.from(document.querySelectorAll(selector));
+ const app=$('#app'),toastEl=$('#toast');
+ let currentPage='auth',adminMode=false,model=null,modelBroken=false,mutating=false;
+ let retryMutation=null,hostBusy=false,gateMode='login',returnPage='home';
+ let selectedServices=new Set(),packageDraft=null,packageBroken=false,avatarMounted='';
+ let toastTimer=null,adminTab='tickets',contactObserver=null;
+
+ const ADMIN_USER='ceoarno';
+ const ADMIN_PASS='Aren.4m004141@';
+
+ function toast(message){
+  toastEl.textContent=message;toastEl.classList.add('show');
+  clearTimeout(toastTimer);toastTimer=setTimeout(()=>toastEl.classList.remove('show'),2700);
+ }
+ function setStatus(id,message,error){
+  const el=$('#'+id);if(!el)return;
+  el.textContent=message||'';el.classList.toggle('error',!!error);
+  el.classList.toggle('success',!!message&&!error);
+ }
+ function esc(value){return ByveAppRuntime.escapeHtml(value==null?'':value)}
+ function localId(){return Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,10)}
+ function normalizeUser(value){return String(value||'').trim().toLocaleLowerCase()}
+ function currentProfile(state){
+  return state.profiles.find(profile=>profile.id===state.activeProfile)||null;
+ }
+
+ /* SHA-256 with pure JS fallback so auth works on file://, http://, https:// & BYVE */
+ function sha256Fallback(str){
+  function rr(n,x){return (x>>>n)|(x<<(32-n))}
+  const K=[0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,
+   0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,
+   0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,
+   0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,
+   0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,
+   0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,
+   0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,
+   0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2];
+  const bytes=unescape(encodeURIComponent(str));
+  const l=bytes.length*8,w=[];
+  for(let i=0;i<bytes.length;i++)w[i>>2]|=(bytes.charCodeAt(i)&0xff)<<(24-(i%4)*8);
+  w[l>>5]|=0x80<<(24-l%32);w[(((l+64)>>9)<<4)+15]=l;
+  let H=[0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19];
+  for(let i=0;i<w.length;i+=16){
+   const m=w.slice(i,i+16);
+   for(let t=16;t<64;t++){
+    const s0=rr(7,m[t-15])^rr(18,m[t-15])^(m[t-15]>>>3);
+    const s1=rr(17,m[t-2])^rr(19,m[t-2])^(m[t-2]>>>10);
+    m[t]=(m[t-16]+s0+m[t-7]+s1)|0;
+   }
+   let [a,b,c,d,e,f,g,h]=H;
+   for(let t=0;t<64;t++){
+    const S1=rr(6,e)^rr(11,e)^rr(25,e),ch=(e&f)^((~e)&g),t1=(h+S1+ch+K[t]+m[t])|0;
+    const S0=rr(2,a)^rr(13,a)^rr(22,a),maj=(a&b)^(a&c)^(b&c),t2=(S0+maj)|0;
+    h=g;g=f;f=e;e=(d+t1)|0;d=c;c=b;b=a;a=(t1+t2)|0;
+   }
+   H=[H[0]+a,H[1]+b,H[2]+c,H[3]+d,H[4]+e,H[5]+f,H[6]+g,H[7]+h].map(v=>v|0);
+  }
+  return H.map(v=>(v>>>0).toString(16).padStart(8,'0')).join('');
+ }
+ async function passwordHash(password){
+  if(window.crypto&&crypto.subtle&&window.TextEncoder){
+   try{
+    const bytes=new TextEncoder().encode(password);
+    const digest=await crypto.subtle.digest('SHA-256',bytes);
+    return Array.from(new Uint8Array(digest)).map(b=>b.toString(16).padStart(2,'0')).join('');
+   }catch(e){}
+  }
+  return sha256Fallback(password);
+ }
+
+ function validWorkspace(value){
+  if(!value||!Array.isArray(value.profiles)||!Array.isArray(value.tickets)||
+   !Array.isArray(value.reviews)||!value.content||typeof value.content!=='object'||
+   !(value.activeProfile===null||typeof value.activeProfile==='string'))return false;
+  if(value.profiles.some(p=>!p||typeof p.id!=='string'||typeof p.name!=='string'||typeof p.phone!=='string'))return false;
+  if(value.tickets.some(t=>!t||typeof t.id!=='string'||!(t.userId===null||typeof t.userId==='string')||
+   typeof t.title!=='string'||typeof t.body!=='string'||!['open','answered'].includes(t.status)||typeof t.reply!=='string'))return false;
+  if(value.reviews.some(r=>!r||typeof r.id!=='string'||!(r.userId===null||typeof r.userId==='string')||
+   typeof r.text!=='string'||typeof r.approved!=='boolean'))return false;
+  for(const k of Object.keys(value.content)){
+   if(value.content[k]!==undefined&&typeof value.content[k]!=='string')return false;
+  }
+  return !value.activeProfile||value.profiles.some(p=>p.id===value.activeProfile);
+ }
+ const initialState={
+  profiles:[],tickets:[],reviews:[],activeProfile:null,
+  content:{hero:'',services:''}
+ };
+
+ function updateAvatar(profile){
+  const image=$('#avatarImage'),letter=$('#avatarLetter');
+  if(!profile||(!profile.avatarAssetId&&!profile.avatarDataUrl)){
+   image.hidden=true;image.removeAttribute('src');letter.hidden=false;avatarMounted='';return;
+  }
+  letter.hidden=true;image.hidden=false;
+  if(profile.avatarDataUrl){
+   image.src=profile.avatarDataUrl;avatarMounted='dataurl';return;
+  }
+  if(avatarMounted===profile.avatarAssetId)return;
+  avatarMounted=profile.avatarAssetId;image.removeAttribute('src');
+  const host=window.BYVE;
+  if(host&&host.assets&&typeof host.assets.mountImage==='function'){
+   host.assets.mountImage(image,profile.avatarAssetId).catch(()=>{});
+  }
+ }
+
+ function setFieldWhenUnfocused(id,value){
+  const field=$('#'+id);
+  if(field&&document.activeElement!==field)field.value=value;
+ }
+
+ function renderWorkspace(state){
+  const profile=currentProfile(state);
+  $('#profileName').textContent=profile?profile.name:'مهمان';
+  $('#profileSummary').textContent=profile?(profile.email||profile.username||'پروفایل کاربری'):'برای دسترسی به امکانات شخصی وارد شوید.';
+  $('#signedInArea').hidden=!profile;
+  $('#authArea').hidden=!!profile;
+  $('#avatarLetter').textContent=profile?(profile.name.trim().charAt(0)||'آ'):'آ';
+  updateAvatar(profile);
+  $('#ticketLoginHint').textContent=profile?'تیکت به پروفایل شما پیوند داده میشود.':'برای ثبت تیکت ابتدا وارد شوید.';
+
+  if(profile){
+   setFieldWhenUnfocused('editName',profile.name);
+   setFieldWhenUnfocused('editEmail',profile.email||'');
+   setFieldWhenUnfocused('editPhone',profile.phone||'');
+  }
+
+  const mine=profile?state.tickets.filter(t=>t.userId===profile.id):[];
+  $('#myTickets').innerHTML=profile&&mine.length?mine.map(t=>
+   '<article class="record"><h3>'+esc(t.title)+'</h3><p>'+esc(t.body)+'</p><small>'+
+   esc(t.status==='answered'?'پاسخ مدیر: '+t.reply:'در انتظار بررسی مدیر')+
+   '</small><div class="record-actions"><button class="button danger small" type="button" data-action="delete-ticket" data-id="'+
+   esc(t.id)+'">حذف درخواست</button></div></article>'
+  ).join(''):'<p class="field-note">'+(profile?'هنوز سفارشی یا تیکتی ثبت نکردهاید.':'برای مشاهده درخواستها وارد شوید.')+'</p>';
+
+  const c=state.content||{};
+  if(c.heroKicker)$('#heroKickerText').textContent=c.heroKicker;
+  if(c.hero)$('#heroCopy').textContent=c.hero;
+  if(c.showcaseTitle)$('#showcaseTitleText').textContent=c.showcaseTitle;
+  if(c.showcaseDesc)$('#showcaseDescText').textContent=c.showcaseDesc;
+  if(c.services)$('#servicesIntro').textContent=c.services;
+  if(c.contact)$('#contactIntro').textContent=c.contact;
+  if(c.serviceSite)$('#serviceSiteText').textContent=c.serviceSite;
+  if(c.serviceMarketing)$('#serviceMarketingText').textContent=c.serviceMarketing;
+  if(c.serviceMedia)$('#serviceMediaText').textContent=c.serviceMedia;
+  if(c.servicesMore)$('#servicesMoreText').textContent=c.servicesMore;
+  if(c.financeNote)$('#financeBodyText').textContent=c.financeNote;
+
+  setFieldWhenUnfocused('editHeroKicker',c.heroKicker||'استودیو خلاقیت و مهندسی برند');
+  setFieldWhenUnfocused('editShowcaseTitle',c.showcaseTitle||'هویت یکپارچه، تجربهای بهیادماندنی');
+  setFieldWhenUnfocused('editHeroCopy',c.hero||$('#heroCopy').textContent);
+  setFieldWhenUnfocused('editShowcaseDesc',c.showcaseDesc||$('#showcaseDescText').textContent);
+  setFieldWhenUnfocused('editServicesIntro',c.services||$('#servicesIntro').textContent);
+  setFieldWhenUnfocused('editSiteService',c.serviceSite||$('#serviceSiteText').textContent);
+  setFieldWhenUnfocused('editMarketingService',c.serviceMarketing||$('#serviceMarketingText').textContent);
+  setFieldWhenUnfocused('editMediaService',c.serviceMedia||$('#serviceMediaText').textContent);
+  setFieldWhenUnfocused('editServicesMore',c.servicesMore||$('#servicesMoreText').textContent);
+  setFieldWhenUnfocused('editContactIntro',c.contact||$('#contactIntro').textContent);
+  setFieldWhenUnfocused('editFinanceNote',c.financeNote||$('#financeBodyText').textContent);
+
+  /* Admin stats & lists */
+  $('#statTickets').textContent=state.tickets.length.toLocaleString('fa-IR');
+  $('#statOpen').textContent=state.tickets.filter(t=>t.status==='open').length.toLocaleString('fa-IR');
+  const pending=state.reviews.filter(r=>!r.approved);
+  $('#statReviews').textContent=pending.length.toLocaleString('fa-IR');
+  $('#statProfiles').textContent=state.profiles.length.toLocaleString('fa-IR');
+
+  $('#adminTickets').innerHTML=state.tickets.length?state.tickets.map(t=>{
+   const owner=state.profiles.find(p=>p.id===t.userId);
+   return '<article class="record"><h3>'+esc(t.title)+'</h3><small>ارسالکننده: '+
+    esc(owner?owner.name+(owner.phone?' ('+owner.phone+')':''):'کاربر حذفشده')+'</small><p>'+esc(t.body)+
+    '</p><label class="field-label" for="reply-'+esc(t.id)+'">پاسخ مدیر</label>'+
+    '<textarea id="reply-'+esc(t.id)+'" data-reply="'+esc(t.id)+'" maxlength="1500">'+esc(t.reply)+'</textarea>'+
+    '<div class="record-actions">'+
+    '<button class="button primary small" type="button" data-action="reply-ticket" data-id="'+esc(t.id)+'">ثبت پاسخ</button>'+
+    '<button class="button soft small" type="button" data-action="toggle-ticket" data-id="'+esc(t.id)+'">'+
+    (t.status==='answered'?'بازگشایی':'تغییر به پاسخدادهشده')+'</button>'+
+    '<button class="button danger small" type="button" data-action="delete-ticket" data-id="'+esc(t.id)+'">حذف</button>'+
+    '</div></article>';
+  }).join(''):'<p class="field-note">هنوز تیکت یا سفارشی ثبت نشده است.</p>';
+
+  $('#adminReviews').innerHTML=pending.length?pending.map(r=>{
+   const owner=state.profiles.find(p=>p.id===r.userId);
+   return '<article class="record"><p>'+esc(r.text)+'</p><small>'+esc(owner?owner.name:'کاربر')+'</small>'+
+    '<div class="record-actions">'+
+    '<button class="button primary small" type="button" data-action="approve-review" data-id="'+esc(r.id)+'">تأیید و انتشار</button>'+
+    '<button class="button danger small" type="button" data-action="delete-review" data-id="'+esc(r.id)+'">حذف</button>'+
+    '</div></article>';
+  }).join(''):'<p class="field-note">دیدگاهی در انتظار بررسی نیست.</p>';
+
+  $('#adminProfiles').innerHTML=state.profiles.length?state.profiles.map(p=>
+   '<article class="record"><h3>'+esc(p.name)+'</h3><small>نام کاربری: '+esc(p.username||'—')+
+   ' · ایمیل: '+esc(p.email||'—')+' · تماس: '+esc(p.phone||'—')+'</small>'+
+   '<div class="record-actions"><button class="button danger small" type="button" data-action="admin-delete-profile" data-id="'+
+   esc(p.id)+'">حذف کاربر</button></div></article>'
+  ).join(''):'<p class="field-note">هنوز کاربری ثبتنام نکرده است.</p>';
+
+  const approved=state.reviews.filter(r=>r.approved);
+  $('#approvedReviews').innerHTML=approved.length?approved.map(r=>{
+   const owner=state.profiles.find(p=>p.id===r.userId);
+   return '<article class="record"><p>«'+esc(r.text)+'»</p><small>'+esc(owner?owner.name:'همراه آرنو')+'</small></article>';
+  }).join(''):'<p class="field-note">هنوز دیدگاهی منتشر نشده است.</p>';
+
+  updateServiceSelection();
+ }
+
+ function showPage(name){
+  const profile=model?currentProfile(model.read()):null;
+  if(name==='admin'&&!adminMode)name='auth';
+  if(!adminMode&&!profile&&name!=='auth'){
+   returnPage=name==='profile'?'home':name;
+   name='auth';
+  }
+  const allowed=['auth','home','services','contact','profile','admin','finance','faq','reviews'];
+  if(!allowed.includes(name))name=profile?'home':'auth';
+  currentPage=name;
+  $$('[data-page]').forEach(p=>{p.hidden=p.dataset.page!==name});
+  const hideNav=(name==='auth'||name==='admin');
+  $('#bottomNav').hidden=hideNav;
+  $('#pageTitle').textContent={
+   auth:'ورود به آرنو',home:'استودیو خلاقیت و رشد دیجیتال',services:'خدمات آرنو',
+   contact:'ارتباط با آرنو',profile:'پروفایل کاربری',admin:'پنل مدیریت آرنو',
+   finance:'امور فایننس و فارکس',faq:'پرسشهای رایج',reviews:'دیدگاه کاربران'
+  }[name]||'ArnØ';
+  $$('.nav-btn').forEach(btn=>{
+   if(btn.dataset.pageTarget===name)btn.setAttribute('aria-current','page');
+   else btn.removeAttribute('aria-current');
+  });
+  if(name==='contact')revealContactItems();
+  closeMenu();window.scrollTo(0,0);
+ }
+
+ function revealContactItems(){
+  const items=$$('#contactList .contact-item');
+  items.forEach(el=>el.classList.remove('revealed'));
+  if('IntersectionObserver' in window){
+   if(contactObserver)contactObserver.disconnect();
+   contactObserver=new IntersectionObserver(entries=>{
+    entries.forEach(entry=>{
+     if(entry.isIntersecting){
+      const idx=items.indexOf(entry.target);
+      setTimeout(()=>entry.target.classList.add('revealed'),Math.max(0,idx)*65);
+      contactObserver.unobserve(entry.target);
+     }
+    });
+   },{threshold:0.08});
+   items.forEach(el=>contactObserver.observe(el));
+  }else{
+   items.forEach((el,i)=>setTimeout(()=>el.classList.add('revealed'),i*70));
+  }
+ }
+
+ function setGateMode(mode){
+  gateMode=mode==='register'?'register':'login';
+  $('#gateLoginForm').hidden=gateMode!=='login';
+  $('#gateRegisterForm').hidden=gateMode!=='register';
+  setStatus('gateStatus','',false);
+ }
+ function openMenu(){$('#drawer').hidden=false;$('#menuShade').hidden=false}
+ function closeMenu(){$('#drawer').hidden=true;$('#menuShade').hidden=true}
+
+ function updateServiceSelection(){
+  $$('[data-action="select-service"]').forEach(btn=>{
+   const sel=selectedServices.has(btn.dataset.service);
+   btn.setAttribute('aria-pressed',String(sel));
+   btn.textContent=sel?'انتخاب شد ✓':'انتخاب خدمت';
+   const card=btn.closest('.service-card');
+   if(card)card.classList.toggle('selected',sel);
+  });
+  $('#selectedServices').textContent=selectedServices.size?
+   'خدمات انتخابشده: '+Array.from(selectedServices).join('، '):'هنوز خدمتی انتخاب نشده است.';
+ }
+
+ async function flushBridge(){
+  const host=window.BYVE;
+  if(host&&host.storage&&typeof host.storage.flush==='function'){
+   return host.storage.flush();
+  }
+  return Promise.resolve();
+ }
+
+ async function runMutation(mutator,successMessage,statusId='authStatus'){
+  if(modelBroken||!model){setStatus(statusId,'ذخیره در دسترس نیست.',true);return false}
+  if(mutating){setStatus(statusId,'درخواست قبلی در حال انجام است.',true);return false}
+  mutating=true;
+  try{
+   const result=await model.change(mutator,{history:false});
+   if(!result.applied||!result.saved){
+    setStatus(statusId,'ذخیره تأیید نشد؛ دوباره تلاش کنید.',true);return false;
+   }
+   setStatus(statusId,successMessage,false);
+   if(successMessage)toast(successMessage);
+   return true;
+  }catch(e){
+   setStatus(statusId,'خطا در ذخیرهسازی اطلاعات.',true);return false;
+  }finally{mutating=false}
+ }
+
+ async function handleGateLogin(event){
+  event.preventDefault();
+  const userRaw=$('#gateLoginUser').value.trim();
+  const pass=$('#gateLoginPass').value;
+  if(!userRaw||!pass){setStatus('gateStatus','نام کاربری و رمز عبور را وارد کنید.',true);return}
+
+  if(normalizeUser(userRaw)===ADMIN_USER&&pass===ADMIN_PASS){
+   adminMode=true;
+   event.currentTarget.reset();
+   setStatus('gateStatus','',false);
+   showPage('admin');
+   model.repaint();
+   toast('خوش آمدید مدیر آرنو');
+   return;
+  }
+
+  const query=normalizeUser(userRaw);
+  const profile=model.read().profiles.find(p=>normalizeUser(p.username)===query||normalizeUser(p.email)===query);
+  if(!profile){
+   setStatus('gateStatus','حسابی با این مشخصات یافت نشد؛ از گزینه ثبتنام استفاده کنید.',true);return;
+  }
+  const hash=await passwordHash(pass);
+  if(profile.passwordHash&&profile.passwordHash!==hash){
+   setStatus('gateStatus','رمز عبور نادرست است.',true);return;
+  }
+  const ok=await runMutation(s=>{s.activeProfile=profile.id},'با موفقیت وارد شدید.','gateStatus');
+  if(ok){
+   event.currentTarget.reset();
+   showPage(returnPage||'home');returnPage='home';
+  }
+ }
+
+ async function handleGateRegister(event){
+  event.preventDefault();
+  const name=$('#gateRegName').value.trim();
+  const username=$('#gateRegUser').value.trim();
+  const email=$('#gateRegEmail').value.trim();
+  const pass=$('#gateRegPass').value;
+  const phone=$('#gateRegPhone').value.trim();
+  if(!name||!username||!email||!pass){setStatus('gateStatus','فیلدهای ستارهدار الزامی هستند.',true);return}
+  if(pass.length<6){setStatus('gateStatus','رمز عبور باید دستکم ۶ نویسه باشد.',true);return}
+  if(normalizeUser(username)===ADMIN_USER){setStatus('gateStatus','این نام کاربری قابل ثبت نیست.',true);return}
+
+  const current=model.read();
+  if(current.profiles.some(p=>normalizeUser(p.username)===normalizeUser(username)||normalizeUser(p.email)===normalizeUser(email))){
+   setStatus('gateStatus','این نام کاربری یا ایمیل قبلاً ثبت شده است.',true);return;
+  }
+  const hash=await passwordHash(pass);
+  const profile={id:localId(),name,username,email,phone,passwordHash:hash};
+  const ok=await runMutation(s=>{
+   s.profiles.push(profile);s.activeProfile=profile.id;
+  },'ثبتنام انجام شد و وارد شدید.','gateStatus');
+  if(ok){
+   event.currentTarget.reset();setGateMode('login');
+   showPage(returnPage||'home');returnPage='home';
+  }
+ }
+
+ function packageValue(){return {services:Array.from(selectedServices),text:$('#orderBody').value,title:$('#orderTitle').value}}
+ function validatePackage(v){
+  return !!v&&Array.isArray(v.services)&&typeof v.text==='string'&&typeof v.title==='string';
+ }
+ function loadPackageFromStorage(){
+  try{
+   const raw=localStorage.getItem('arnoPackage');
+   if(raw===null)return;
+   const val=JSON.parse(raw);
+   if(!validatePackage(val))throw new Error('invalid');
+   packageDraft=val;
+  }catch(e){packageBroken=true;$('#packageRecovery').hidden=false}
+ }
+ async function savePackage(){
+  const val=packageValue();
+  try{
+   localStorage.setItem('arnoPackage',JSON.stringify(val));
+   await flushBridge();
+   packageDraft=val;setStatus('orderStatus','پیشنویس ذخیره شد.',false);toast('پیشنویس ذخیره شد.');
+  }catch(e){setStatus('orderStatus','ذخیره پیشنویس انجام نشد.',true)}
+ }
+ function restorePackage(){
+  if(!packageDraft){setStatus('orderStatus','پیشنویسی ذخیره نشده است.',true);return}
+  selectedServices=new Set(packageDraft.services);
+  $('#orderTitle').value=packageDraft.title;$('#orderBody').value=packageDraft.text;
+  updateServiceSelection();setStatus('orderStatus','پیشنویس بازیابی شد.',false);
+ }
+
+ async function submitOrder(event){
+  event.preventDefault();
+  if(!selectedServices.size){setStatus('orderStatus','لطفاً دستکم یک خدمت را انتخاب کنید.',true);return}
+  const profile=currentProfile(model.read());
+  if(!profile){showPage('auth');return}
+  const title=$('#orderTitle').value.trim(),body=$('#orderBody').value.trim();
+  if(!title||!body){setStatus('orderStatus','موضوع و توضیحات سفارش را وارد کنید.',true);return}
+  const ticket={
+   id:localId(),userId:profile.id,title,
+   body:'خدمات انتخابشده: '+Array.from(selectedServices).join('، ')+'\n\n'+body,
+   status:'open',reply:''
+  };
+  const ok=await runMutation(s=>{s.tickets.push(ticket)},'سفارش شما ثبت شد و به پنل مدیریت ارسال گردید.','orderStatus');
+  if(ok){$('#orderTitle').value='';$('#orderBody').value='';selectedServices.clear();updateServiceSelection()}
+ }
+
+ async function submitContactTicket(event){
+  event.preventDefault();
+  const profile=currentProfile(model.read());
+  if(!profile){showPage('auth');return}
+  const title=$('#contactTicketTitle').value.trim(),body=$('#contactTicketBody').value.trim();
+  if(!title||!body){setStatus('contactTicketStatus','موضوع و شرح تیکت را کامل کنید.',true);return}
+  const ticket={id:localId(),userId:profile.id,title,body,status:'open',reply:''};
+  const ok=await runMutation(s=>{s.tickets.push(ticket)},'تیکت مستقیم برای مدیریت ارسال شد.','contactTicketStatus');
+  if(ok){event.currentTarget.reset();$('#contactTicketForm').hidden=true}
+ }
+
+ async function saveProfile(event){
+  event.preventDefault();
+  const state=model.read(),profile=currentProfile(state);
+  if(!profile)return;
+  const name=$('#editName').value.trim(),email=$('#editEmail').value.trim(),phone=$('#editPhone').value.trim();
+  if(!name){setStatus('authStatus','نام نمایشی نمیتواند خالی باشد.',true);return}
+  await runMutation(s=>{
+   const t=s.profiles.find(p=>p.id===profile.id);
+   if(t){t.name=name;t.email=email;t.phone=phone}
+  },'تغییرات پروفایل ذخیره شد.','authStatus');
+ }
+
+ async function chooseAvatar(){
+  const host=window.BYVE;
+  if(host&&typeof host.invoke==='function'&&!hostBusy){
+   hostBusy=true;
+   try{
+    const res=await host.invoke('photo.pick',{});
+    const assetId=res&&res.data&&res.data.assetId;
+    if(assetId){
+     const profile=currentProfile(model.read());
+     await runMutation(s=>{
+      const t=s.profiles.find(p=>p.id===profile.id);
+      if(t){t.avatarAssetId=assetId;delete t.avatarDataUrl}
+     },'عکس آواتار بهروز شد.','authStatus');
+     avatarMounted='';
+     hostBusy=false;
+     return;
+    }
+   }catch(e){}
+   hostBusy=false;
+  }
+  $('#avatarFileInput').click();
+ }
+
+ function handleAvatarFile(event){
+  const file=event.target.files&&event.target.files[0];
+  if(!file)return;
+  const reader=new FileReader();
+  reader.onload=()=>{
+   const img=new Image();
+   img.onload=async ()=>{
+    const canvas=document.createElement('canvas');
+    const max=256,scale=Math.min(1,max/Math.max(img.width,img.height));
+    canvas.width=Math.round(img.width*scale);canvas.height=Math.round(img.height*scale);
+    canvas.getContext('2d').drawImage(img,0,0,canvas.width,canvas.height);
+    const dataUrl=canvas.toDataURL('image/jpeg',0.82);
+    const profile=currentProfile(model.read());
+    if(!profile)return;
+    await runMutation(s=>{
+     const t=s.profiles.find(p=>p.id===profile.id);
+     if(t)t.avatarDataUrl=dataUrl;
+    },'عکس آواتار ذخیره شد.','authStatus');
+   };
+   img.src=String(reader.result||'');
+  };
+  reader.readAsDataURL(file);
+  event.target.value='';
+ }
+
+ async function sendReview(event){
+  event.preventDefault();
+  const profile=currentProfile(model.read());
+  if(!profile){showPage('auth');return}
+  const text=$('#reviewText').value.trim();
+  if(!text){setStatus('reviewStatus','متن دیدگاه را وارد کنید.',true);return}
+  const ok=await runMutation(s=>{s.reviews.push({id:localId(),userId:profile.id,text,approved:false})},
+   'دیدگاه برای تأیید مدیر ارسال شد.','reviewStatus');
+  if(ok)event.currentTarget.reset();
+ }
+
+ async function saveContent(event){
+  event.preventDefault();
+  if(!adminMode)return;
+  const content={
+   heroKicker:$('#editHeroKicker').value.trim(),
+   hero:$('#editHeroCopy').value.trim(),
+   showcaseTitle:$('#editShowcaseTitle').value.trim(),
+   showcaseDesc:$('#editShowcaseDesc').value.trim(),
+   services:$('#editServicesIntro').value.trim(),
+   serviceSite:$('#editSiteService').value.trim(),
+   serviceMarketing:$('#editMarketingService').value.trim(),
+   serviceMedia:$('#editMediaService').value.trim(),
+   servicesMore:$('#editServicesMore').value.trim(),
+   contact:$('#editContactIntro').value.trim(),
+   financeNote:$('#editFinanceNote').value.trim()
+  };
+  await runMutation(s=>{s.content={...s.content,...content}},'تمام متنهای اپلیکیشن ذخیره شد.','adminStatus');
+ }
+
+ async function launchExternal(action,args,fallbackUrl,statusId,msg){
+  const host=window.BYVE;
+  if(host&&typeof host.invoke==='function'&&!hostBusy){
+   hostBusy=true;
+   try{
+    await host.invoke(action,args);
+    setStatus(statusId,msg,false);
+    hostBusy=false;
+    return;
+   }catch(e){}
+   hostBusy=false;
+  }
+  if(fallbackUrl.startsWith('http'))window.open(fallbackUrl,'_blank','noopener');
+  else window.location.href=fallbackUrl;
+  setStatus(statusId,msg,false);
+ }
+
+ const actionHandlers={
+  'navigate':(e,c)=>showPage(c.dataset.pageTarget),
+  'go-home':e=>{e.preventDefault();showPage('home')},
+  'go-services':e=>{e.preventDefault();showPage('services')},
+  'go-contact':e=>{e.preventDefault();showPage('contact')},
+  'menu':()=>openMenu(),
+  'close-menu':()=>closeMenu(),
+  'gate-mode':(e,c)=>setGateMode(c.dataset.mode),
+  'open-gate':()=>showPage('auth'),
+  'select-service':(e,c)=>{
+   const name=c.dataset.service;
+   if(selectedServices.has(name))selectedServices.delete(name);else selectedServices.add(name);
+   updateServiceSelection();
+  },
+  'save-package':()=>savePackage(),
+  'load-package':()=>restorePackage(),
+  'ticket-contact':()=>{
+   $('#contactTicketForm').hidden=false;
+   $('#contactTicketForm').scrollIntoView({behavior:'smooth',block:'nearest'});
+  },
+  'cancel-ticket':()=>{$('#contactTicketForm').hidden=true},
+  'avatar':()=>chooseAvatar(),
+  'logout':async()=>{
+   await runMutation(s=>{s.activeProfile=null},'از حساب کاربری خارج شدید.','gateStatus');
+   showPage('auth');
+  },
+  'delete-account':async()=>{
+   const p=currentProfile(model.read());
+   if(!p||!window.confirm('پروفایل شما و تمام درخواستهایتان حذف شود؟'))return;
+   await runMutation(s=>{
+    s.profiles=s.profiles.filter(x=>x.id!==p.id);
+    s.tickets=s.tickets.filter(x=>x.userId!==p.id);
+    s.reviews=s.reviews.filter(x=>x.userId!==p.id);
+    s.activeProfile=null;
+   },'پروفایل حذف شد.','gateStatus');
+   showPage('auth');
+  },
+  'admin-logout':()=>{adminMode=false;showPage('auth');toast('از پنل مدیریت خارج شدید.')},
+  'admin-tab':(e,c)=>{
+   adminTab=c.dataset.tab;
+   $$('[data-action="admin-tab"]').forEach(b=>b.classList.toggle('active',b.dataset.tab===adminTab));
+   $$('[data-admin-panel]').forEach(p=>{p.hidden=p.dataset.adminPanel!==adminTab});
+  },
+  'export-backup':()=>{
+   const blob=new Blob([JSON.stringify(model.read(),null,2)],{type:'application/json'});
+   const a=document.createElement('a');
+   a.href=URL.createObjectURL(blob);a.download='arno-backup.json';a.click();
+   toast('فایل پشتیبان آماده شد.');
+  },
+  'delete-ticket':async(e,c)=>{
+   const id=c.dataset.id;
+   if(!window.confirm('این درخواست حذف شود؟'))return;
+   await runMutation(s=>{s.tickets=s.tickets.filter(t=>t.id!==id)},'حذف شد.',adminMode?'adminStatus':'authStatus');
+  },
+  'reply-ticket':async(e,c)=>{
+   const id=c.dataset.id,field=$('[data-reply="'+CSS.escape(id)+'"]');
+   const reply=field?field.value.trim():'';
+   await runMutation(s=>{
+    const t=s.tickets.find(x=>x.id===id);
+    if(t){t.reply=reply;t.status='answered'}
+   },'پاسخ ثبت شد.','adminStatus');
+  },
+  'toggle-ticket':async(e,c)=>{
+   const id=c.dataset.id;
+   await runMutation(s=>{
+    const t=s.tickets.find(x=>x.id===id);
+    if(t)t.status=t.status==='answered'?'open':'answered';
+   },'وضعیت تغییر کرد.','adminStatus');
+  },
+  'approve-review':async(e,c)=>{
+   const id=c.dataset.id;
+   await runMutation(s=>{
+    const r=s.reviews.find(x=>x.id===id);
+    if(r)r.approved=true;
+   },'دیدگاه تأیید شد.','adminStatus');
+  },
+  'delete-review':async(e,c)=>{
+   const id=c.dataset.id;
+   if(!window.confirm('دیدگاه حذف شود؟'))return;
+   await runMutation(s=>{s.reviews=s.reviews.filter(r=>r.id!==id)},'دیدگاه حذف شد.','adminStatus');
+  },
+  'admin-delete-profile':async(e,c)=>{
+   const id=c.dataset.id;
+   if(!window.confirm('این کاربر و درخواستهایش حذف شوند؟'))return;
+   await runMutation(s=>{
+    s.profiles=s.profiles.filter(x=>x.id!==id);
+    s.tickets=s.tickets.filter(x=>x.userId!==id);
+    s.reviews=s.reviews.filter(x=>x.userId!==id);
+    if(s.activeProfile===id)s.activeProfile=null;
+   },'کاربر حذف شد.','adminStatus');
+  },
+  'dial':(e,c)=>launchExternal('phone.dial',{number:c.dataset.value},'tel:'+c.dataset.value,'contactStatus','شمارهگیر با مقصد '+c.dataset.value+' باز شد.'),
+  'email':(e,c)=>launchExternal('email.compose',{to:c.dataset.value},'mailto:'+c.dataset.value,'contactStatus','برنامه ایمیل با مقصد '+c.dataset.value+' باز شد.'),
+  'whatsapp':(e,c)=>{
+   const num=c.dataset.value.replace(/\D/g,'').replace(/^0/,'');
+   const url='https://wa.me/98'+num;
+   launchExternal('browser.open',{url},url,'contactStatus','واتساپ با شماره '+c.dataset.value+' باز شد.');
+  }
+ };
+
+ ByveAppRuntime.bindActions(app,actionHandlers,{
+  onError:()=>toast('خطا در اجرای عملیات؛ اطلاعات شما حفظ شده است.')
+ });
+
+ $('#gateLoginForm').addEventListener('submit',handleGateLogin);
+ $('#gateRegisterForm').addEventListener('submit',handleGateRegister);
+ $('#orderForm').addEventListener('submit',submitOrder);
+ $('#contactTicket').addEventListener('submit',submitContactTicket);
+ $('#profileEditForm').addEventListener('submit',saveProfile);
+ $('#avatarFileInput').addEventListener('change',handleAvatarFile);
+ $('#reviewForm').addEventListener('submit',sendReview);
+ $('#contentForm').addEventListener('submit',saveContent);
+ $('#menuShade').addEventListener('click',closeMenu);
+ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('#drawer').hidden)closeMenu()});
+
+ /* Before/After Slider Interaction */
+ const baRange=$('#baRange'),baAfter=$('#baAfterLayer'),baDiv=$('#baDivider'),baHand=$('#baHandle');
+ function updateBa(val){
+  const v=Math.max(5,Math.min(95,Number(val)||50));
+  baAfter.style.clipPath='inset(0 0 0 '+v+'%)';
+  baDiv.style.left=v+'%';
+  baHand.style.left=v+'%';
+ }
+ baRange.addEventListener('input',e=>updateBa(e.target.value));
+ updateBa(50);
+
+ try{
+  model=ByveAppRuntime.createModel({
+   initial:initialState,key:'arnoWorkspaceV1',
+   validate:validWorkspace,render:renderWorkspace,flush:flushBridge
+  });
+  modelBroken=false;model.repaint();
+ }catch(e){
+  modelBroken=true;$('#workspaceRecovery').hidden=false;
+  renderWorkspace(initialState);
+ }
+ loadPackageFromStorage();
+ updateServiceSelection();
+
+ const active=model?currentProfile(model.read()):null;
+ if(active)showPage(location.hash==='#finance'?'finance':'home');
+ else showPage('auth');
+
+ if(window.BYVE&&window.BYVE.back&&typeof window.BYVE.back.subscribe==='function'){
+  window.BYVE.back.subscribe(()=>{
+   if(!$('#drawer').hidden){closeMenu();return true}
+   if(currentPage!=='home'&&currentPage!=='auth'&&currentPage!=='admin'){showPage('home');return true}
+   return false;
+  });
+ }
+})();
+</script>
+</body>
+</html>
